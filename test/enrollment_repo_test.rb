@@ -14,7 +14,7 @@ class EnrollmentRepoTest < Minitest::Test
         :high_school_graduation => "./test/data/high_school.csv"
         }
       })
-
+      
     assert_equal "COLORADO", er.find_by_name("Colorado").name
   end
   #

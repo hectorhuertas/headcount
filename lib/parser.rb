@@ -27,18 +27,22 @@ module Parser
 
   def self.parse(info)
     lines = CSV.open(info[1], headers: true, header_converters: :symbol).map do |row|
-      {:name => row[:location], info[0] => {row[:timeframe].to_i => row[:data].to_f.round(3)} }
+      {:name => row[:location], info[0] => {row[:timeframe].to_i => row[:data].to_i.round(3)} }
     end
-    # @name = {}
-    lines.reduce({}) do |hash, row|
-        binding.pry
-      if @hash[:hash] == row[:location]
-       @hash[:data][row[:timeframe].to_i]= row[:data].to_f.round(3)
-       array << @hash
+    # binding.pry
+    @new_hash = {}
+    @diff = []
+    lines.reduce([]) do |array, row|
+      if @new_hash[:name] == row[:name]
+      plz = @new_hash[info[0]].merge(row[info[0]])
+      @new_hash = {:name => @new_hash[:name], info[0] => plz }
+       array << @new_hash
       else
-        @hash = {:hash => row[:location], :kindergarten => {row[:timeframe].to_i => row[:data].to_f.round(3)}}
-        array << @hash
-      end.uniq
+        @diff << @new_hash if ! @new_hash.empty?
+        puts @diff
+        @new_hash = row
+        array << @new_hash
+      end
     end
   end
 
