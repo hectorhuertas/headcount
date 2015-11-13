@@ -1,3 +1,5 @@
+require './lib/stat'
+
 class HeadcountAnalyst
   attr_reader :district_repository
 
@@ -5,55 +7,96 @@ class HeadcountAnalyst
     @district_repository = dr
   end
 
-  def kindergarten_participation_rate_variation(d1_name, options)
-    d2_name = options[:against]
+  def kindergarten_participation_rate_variation(d1_name, options = {against:'colorado'})
+    general_variation(d1_name,
+                      options[:against],
+                      :enrollment,
+                      :kindergarten_participation_by_year)
+  end
+
+  def general_variation(d1_name, d2_name, area, type)
     dist_1 = district_repository.find_by_name(d1_name)
     dist_2 = district_repository.find_by_name(d2_name)
 
-    # rates_1 = dist_1.enrollment.kindergarten_participation_by_year
-    # rates_2 = dist_2.enrollment.kindergarten_participation_by_year
+    data_1 = load_district_data(dist_1, area, type)
+    data_2 = load_district_data(dist_2, area, type)
 
-    kindergarten_participation_rate_variation_of_enrollments(dist_1.enrollment, dist_2.enrollment)
+    Stat.variation(data_1, data_2)
   end
 
-  def kindergarten_participation_rate_variation_of_enrollments(e1, e2)
-    avg1 = kindergarten_participation_average(e1)
-    avg2 = kindergarten_participation_average(e2)
-    avg1 / avg2
-  end
-
-  def kindergarten_participation_average(e)
-    sum   = e.kindergarten_participation_by_year.values.reduce(:+)
-    count = e.kindergarten_participation_by_year.length
-    sum / count
-  end
+  # def general_variance(d_name, area1, type1, area2, type2)
+  #   dist = district_repository.find_by_name(d_name)
+  #
+  #   v1 = general_variation / general_variation
+  # end
 
   def kindergarten_participation_rate_variation_trend(d1_name, options)
     d2_name = options[:against]
     dist_1 = district_repository.find_by_name(d1_name)
     dist_2 = district_repository.find_by_name(d2_name)
 
-    # rates_1 = dist_1.enrollment.kindergarten_participation_by_year
-    # rates_2 = dist_2.enrollment.kindergarten_participation_by_year
-
-    kindergarten_trend_for_enrollments(dist_1.enrollment, dist_2.enrollment)
+    trend_1 = dist_1.enrollment.kindergarten_participation_by_year
+    trend_2 = dist_2.enrollment.kindergarten_participation_by_year
+    Stat.compare_trends(trend_1, trend_2)
   end
 
-  def kindergarten_trend_for_enrollments(e1, e2)
-    rates_1 = e1.kindergarten_participation_by_year
-    rates_2 = e2.kindergarten_participation_by_year
-    years = rates_1.keys & rates_2.keys
-
-    year_rates_1 ={}
-    years.each {|year| year_rates_1[year]=rates_1[year]}
-    year_rates_2 ={}
-    years.each {|year| year_rates_2[year]=rates_2[year]}
-    # binding.pry
-    trends = year_rates_1.merge(year_rates_2) do |year, av1, av2|
-      av2/av1
-     end
-    # end
-
-    trends.sort.to_h
+  def load_district_data(district, area, type)
+    district.send(area).send(type)
   end
+
+  info = {area: :enrollment, type: :kindergarten }
+  def average(district, area, type)
+    data = load_district_data(district, area, type)
+    sum = data.values.reduce(:+)
+    count = data.size
+    sum / count
+  end
+
+  def kindergarten_participation_against_high_school_graduation(d_name)
+      dist = district_repository.find_by_name(d_name)
+      state = district_repository.find_by_name('colorado')
+      #
+      #
+      # kinder_average = average(dist, :enrollment, :kindergarten_participation_by_year)
+      # kinder_state = average(state, :enrollment, :kindergarten_participation_by_year)
+      # kinder_variation = kinder_average / kinder_state
+      # kinder_variation = general_variation
+
+      # graduation_average = average(dist, :enrollment,:kindergarten_participation_by_year)
+      # graduation_state = average(state, :enrollment, :kindergarten_participation_by_year)
+      # graduation_variation = graduation_average / graduation_state
+      graduation_average = average(dist, :enrollment,:graduation_rate_by_year)
+      graduation_state = average(state, :enrollment, :graduation_rate_by_year)
+      graduation_variation = graduation_average / graduation_state
+
+      # kinder_variation / graduation_variation
+      kindergarten_participation_rate_variation_trend(d_name) / graduation_variation
+  end
+
+  def kindergarten_participation_correlates_with_high_school_graduation(options)
+    if options[:for]
+      if options[:for].upcase != 'COLORADO'
+        correlation = kindergarten_participation_against_high_school_graduation(options[:for])
+        if 0.6 < correlation && correlation < 1.5
+          true
+        end
+      else
+        passing = district_repository.districts.count{|d| kindergarten_participation_correlates_with_high_school_graduation(d) if d.name!='COLORADO'}
+        if (passing / district_repository.districts.size) > 0.7
+          true
+        else
+          false
+        end
+      end
+    elsif options[:across]
+      passing = options[:across].count{|d| kindergarten_participation_correlates_with_high_school_graduation(d)}
+      if (passing / options[:across].size) > 0.7
+        true
+      else
+        false
+      end
+    end
+  end
+
+
 end
