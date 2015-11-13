@@ -10,38 +10,29 @@ module Parser
     names.uniq
   end
 
-  def self.parse2(info)
-    @name = {}
-    CSV.open(info[1], headers: true, header_converters: :symbol).reduce([]) do |array, row|
-      # binding.pry
-      if @name[:name] == row[:location]
-       @name[:data][row[:timeframe].to_i]= row[:data].to_f.round(3)
-       array << @name
-      else
-        # puts info[0]
-        @name = {:name => row[:location], :data => {row[:timeframe].to_i => row[:data].to_f.round(3)}}
-        array << @name
-      end.uniq
-    end
-  end
-
   def self.parse(info)
     lines = CSV.open(info[1], headers: true, header_converters: :symbol).map do |row|
       {:name => row[:location], info[0] => {row[:timeframe].to_i => row[:data].to_f.round(3)} }
     end
-    # @name = {}
-    lines.reduce({}) do |hash, row|
-        binding.pry
-      if @hash[:hash] == row[:location]
-       @hash[:data][row[:timeframe].to_i]= row[:data].to_f.round(3)
-       array << @hash
-      else
-        @hash = {:hash => row[:location], :kindergarten => {row[:timeframe].to_i => row[:data].to_f.round(3)}}
-        array << @hash
-      end.uniq
+
+    new_array = []
+    name = lines.group_by { |hash| hash[:name]}
+    list_names = lines.map {|name| name[:name] }.uniq
+
+
+    name.each do |s, thing|
+      array = []
+      thing.each do |data|
+        array << data[info[0]]
+      end
+      new_array << array.reduce(:merge)
     end
+    new_array.rotate(new_array.count - 1 )
+    hey = list_names.map do |name|
+      new_array.rotate
+      {:name => name, info[0] => new_array[0]}
+      # new_array.pop if !new_array.empty?
+    end
+    hey
   end
-
-
-
 end
