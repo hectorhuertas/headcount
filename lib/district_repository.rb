@@ -17,8 +17,6 @@ class DistrictRepository
     # Parser.parse(data[:enrollment][:kindergarten])
       enrollment_repo.load_data(data)
       create_districts_from_repos!
-
-
     #load all files
     #load all data
     # create_districts(Parser.get_names(data[:enrollment][:kindergarten]))
@@ -46,7 +44,7 @@ class DistrictRepository
     d_names = @enrollment_repo.enrollments.map(&:name).uniq
     districts = d_names.map do |n|
       d = District.new(name:n)
-      d.enrollment = enrollment_repo.find_by_name(n)
+      d.add_enrollments enrollment_repo.find_by_name(n)
       d
     end
     @districts = districts

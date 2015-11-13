@@ -10,20 +10,13 @@ class EnrollmentRepo
   end
 
   def load_data(data)
-    # puts data[:enrollment][:kindergarten]
-  #  puts data[:enrollment][:high_school_graduation]
     loaded_data = []
-    # binding.pry
-    # puts data[:enrollment].to_a.inspect
     data[:enrollment].each do |filename|
-      # puts filename
-      # binding.pry
       loaded_data += Parser.parse(filename)
     end
-    # loaded_data = Parser.parse(data[:enrollment][:kindergarten])
-    # loaded_data += Parser.parse(data[:enrollment][:high_school_graduation])
-    # binding.pry
-    loaded_data.each do |name|
+    fun = loaded_data.group_by { |hash| hash[:name] }.map { |dist_name, dist_hashes| dist_hashes.reduce(:merge)}
+    binding.pry
+    fun.each do |name|
       @enrollments << Enrollment.new(name)
     end
   end
@@ -34,5 +27,10 @@ class EnrollmentRepo
 
   def add_enrollments(enrollments)
     @enrollments += enrollments
+  end
+
+  def connecting_info_in_hash(data)
+    data
+    name_now = data[:name]
   end
 end

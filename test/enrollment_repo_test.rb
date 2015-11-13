@@ -7,6 +7,7 @@ class EnrollmentRepoTest < Minitest::Test
   end
 
   def test_it_loads_several_data
+
     er = EnrollmentRepo.new
     er.load_data({
       :enrollment => {
