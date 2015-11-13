@@ -19,6 +19,7 @@ class HeadcountAnalystTest < Minitest::Test
   end
 
   def test_it_compares_kindergarten_rates_across_districts
+    skip
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0}})
     e2 = Enrollment.new({name: "Dist_2",

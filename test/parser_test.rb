@@ -6,9 +6,11 @@ class ParserTest < Minitest::Test
     assert Parser
   end
 
-  # def test_it_takes_a_filename
-  #   assert Parser.get_names("../testdata/kid.csv")
-  # end
-
+  def test_it_brings_file_in
+    skip
+    info = Parser.parse([:kindergarten, "./test/data/kid.csv"])
+    result = {:name=>"Colorado", :kindergarten=>{2007=>0.395}}
+    assert_equal result, info[0]
+  end
 
 end
