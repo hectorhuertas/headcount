@@ -16,6 +16,7 @@ class DistrictRepository
     #   }
     # Parser.parse(data[:enrollment][:kindergarten])
       enrollment_repo.load_data(data)
+      # binding.pry
       create_districts_from_repos!
     #load all files
     #load all data
@@ -40,13 +41,13 @@ class DistrictRepository
   end
 
   def create_districts_from_repos!
-    # binding.pry
     d_names = @enrollment_repo.enrollments.map(&:name).uniq
     districts = d_names.map do |n|
       d = District.new(name:n)
       d.add_enrollments enrollment_repo.find_by_name(n)
       d
     end
+    binding.pry
     @districts = districts
   end
 end

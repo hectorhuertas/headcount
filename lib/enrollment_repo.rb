@@ -15,7 +15,7 @@ class EnrollmentRepo
       loaded_data += Parser.parse(filename)
     end
     fun = loaded_data.group_by { |hash| hash[:name] }.map { |dist_name, dist_hashes| dist_hashes.reduce(:merge)}
-    binding.pry
+    # binding.pry
     fun.each do |name|
       @enrollments << Enrollment.new(name)
     end
