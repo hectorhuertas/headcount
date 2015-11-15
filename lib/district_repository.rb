@@ -18,10 +18,7 @@ class DistrictRepository
       enrollment_repo.load_data(data)
       # binding.pry
       create_districts_from_repos!
-    #load all files
-    #load all data
-    # create_districts(Parser.get_names(data[:enrollment][:kindergarten]))
-    #tell enroll_repo to load file
+
   end
 
   def create_districts(names_array)
@@ -45,9 +42,9 @@ class DistrictRepository
     districts = d_names.map do |n|
       d = District.new(name:n)
       d.add_enrollments enrollment_repo.find_by_name(n)
+    binding.pry
       d
     end
-    binding.pry
     @districts = districts
   end
 end
