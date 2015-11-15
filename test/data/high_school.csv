@@ -1,16 +1,5 @@
 Location,TimeFrame,DataFormat,Data
 Colorado,2010,Percent,0.724
 Colorado,2011,Percent,0.739
-Colorado,2012,Percent,0.75354
-Colorado,2013,Percent,0.769
-Colorado,2014,Percent,0.773
-AGATE 300,2010,Percent,1
 AGATE 300,2011,Percent,0.8
-AGATE 300,2012,Percent,0
-AGATE 300,2013,Percent,0
-ARICKAREE R-2,2010,Percent,1
-ARICKAREE R-2,2011,Percent,1
-ARICKAREE R-2,2012,Percent,1
-EAST YUMA COUNTY RJ-2,2010,Percent,N/A
-EAST YUMA COUNTY RJ-2,2011,Percent,N/A
-EAST YUMA COUNTY RJ-2,2012,Percent,0
+AGATE 300,2012,Percent,0.6

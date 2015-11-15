@@ -37,6 +37,7 @@ class HeadcountAnalystTest < Minitest::Test
   end
 
   def test_it_calculates_kindergarten_participation_trends
+    skip
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0, 2014 => 2.0}})
     e2 = Enrollment.new({name: "Dist_2",
