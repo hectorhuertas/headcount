@@ -17,8 +17,9 @@ module Stat
     common.each {|year| common_trend_1[year]=trend_1[year]}
     common_trend_2 ={}
     common.each {|year| common_trend_2[year]=trend_2[year]}
-     common_trend_1.merge(common_trend_2) do |year, av1, av2|
-      av2/av1
+
+    common_trend_1.merge(common_trend_2) do |year, av1, av2|
+      (av1/av2).round(3)
     end.sort.to_h
   end
 end

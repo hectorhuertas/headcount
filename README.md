@@ -8,3 +8,5 @@ TODO:
 filter weird values on the csv data
   *remove weird data from the general tests
   *create new test files with the weird values
+  *create a method called find_all_matchs!!
+  *round answers coming out of stats

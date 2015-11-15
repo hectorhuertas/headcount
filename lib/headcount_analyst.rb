@@ -8,10 +8,21 @@ class HeadcountAnalyst
   end
 
   def kindergarten_participation_rate_variation(d1_name, options = {against:'colorado'})
-    general_variation(d1_name,
-                      options[:against],
-                      :enrollment,
-                      :kindergarten_participation_by_year)
+    d2_name = options[:against]
+    dist_1 = district_repository.find_by_name(d1_name)
+    dist_2 = district_repository.find_by_name(d2_name)
+
+    data_1 = dist_1.enrollment.kindergarten_participation_by_year
+    data_2 = dist_2.enrollment.kindergarten_participation_by_year
+
+    avg_1 = Stat.average(data_1)
+    avg_2 = Stat.average(data_2)
+
+    avg_1 / avg_2
+    # general_variation(d1_name,
+    #                   options[:against],
+    #                   :enrollment,
+    #                   :kindergarten_participation_by_year)
   end
 
   def general_variation(d1_name, d2_name, area, type)
@@ -35,9 +46,9 @@ class HeadcountAnalyst
     dist_1 = district_repository.find_by_name(d1_name)
     dist_2 = district_repository.find_by_name(d2_name)
 
-    trend_1 = dist_1.enrollment.kindergarten_participation_by_year
-    trend_2 = dist_2.enrollment.kindergarten_participation_by_year
-    Stat.compare_trends(trend_1, trend_2)
+    data_1 = dist_1.enrollment.kindergarten_participation_by_year
+    data_2 = dist_2.enrollment.kindergarten_participation_by_year
+    Stat.compare_trends(data_1, data_2)
   end
 
   def load_district_data(district, area, type)
@@ -50,6 +61,8 @@ class HeadcountAnalyst
     sum = data.values.reduce(:+)
     count = data.size
     sum / count
+    # binding.pry
+    # Stat.average(data)
   end
 
   def kindergarten_participation_against_high_school_graduation(d_name)
@@ -69,8 +82,8 @@ class HeadcountAnalyst
       graduation_state = average(state, :enrollment, :graduation_rate_by_year)
       graduation_variation = graduation_average / graduation_state
 
-      # kinder_variation / graduation_variation
-      kindergarten_participation_rate_variation_trend(d_name) / graduation_variation
+      kinder_variation / graduation_variation
+      # kindergarten_participation_rate_variation_trend(d_name) / graduation_variation
   end
 
   def kindergarten_participation_correlates_with_high_school_graduation(options)

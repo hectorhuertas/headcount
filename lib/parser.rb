@@ -1,12 +1,13 @@
 require 'csv'
 require 'pry'
+
 module Parser
   def self.enrollment(data)
     parsed_data = data.keys.reduce({}) do |result, filetype|
       new_data = send(filetype, data[filetype])
       result.merge(new_data) { |_k, v1, v2| v1.merge v2 }
     end
-    wrap_name(wrap(parsed_data, :enrollment))
+    wrap_name(parsed_data)
   end
 
   def self.kindergarten((filename))

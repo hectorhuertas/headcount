@@ -1,7 +1,7 @@
 require 'csv'
 require 'pry'
 require './lib/parser'
-class EnrollmentRepo
+class EnrollmentRepository
   attr_reader :enrollments
 
   def initialize(enrollments=[])
@@ -12,6 +12,7 @@ class EnrollmentRepo
   def load_data(data)
     enrollments_data = Parser.enrollment(data[:enrollment])
     enrollments_data.each do |hash|
+      # binding.pry
       @enrollments << Enrollment.new(hash)
     end
   end

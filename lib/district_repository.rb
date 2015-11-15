@@ -5,7 +5,7 @@ class DistrictRepository
   attr_reader :districts, :enrollment_repo
 
   def initialize
-    @enrollment_repo = EnrollmentRepo.new
+    @enrollment_repo = EnrollmentRepository.new
     @districts = []
   end
 
@@ -41,12 +41,7 @@ class DistrictRepository
     d_names = @enrollment_repo.enrollments.map(&:name).uniq
     districts = d_names.map do |n|
       d = District.new(name:n)
-<<<<<<< HEAD
-      d.add_enrollments enrollment_repo.find_by_name(n)
-    binding.pry
-=======
       d.add_enrollment enrollment_repo.find_by_name(n)
->>>>>>> f8f7d61c95c241ba8cc18877a605a16284476595
       d
     end
     @districts = districts

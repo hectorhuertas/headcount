@@ -24,7 +24,7 @@ class StatTest < Minitest::Test
     trend_1 = {2010 => 1.0, 2012 => 2.0, 2014 => 2.0}
     trend_2 = {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}
 
-    expected = {2010 => 2.0, 2014 => 0.5}
+    expected = {2010 => 0.5, 2014 => 2.0}
 
     assert_equal expected, Stat.compare_trends(trend_1, trend_2)
   end

@@ -1,14 +1,28 @@
 require 'minitest/autorun'
-require_relative '../lib/enrollment_repo'
+require_relative '../lib/enrollment_repository'
 
-class EnrollmentRepoTest < Minitest::Test
+class EnrollmentRepositoryTest < Minitest::Test
+  def fake_loaded_enrollment
+    EnrollmentRepository.new([Enrollment.new({name:"FAKE"})])
+  end
+
+
   def test_it_exists
-    assert EnrollmentRepo
+    assert EnrollmentRepository
+  end
+
+  def test_find_by_name
+    er = fake_loaded_enrollment
+    assert_equal "FAKE", er.find_by_name("fake").name
+  end
+
+  def test_find_by_name_equals_nil_when_false
+    er = fake_loaded_enrollment
+    assert_equal nil, er.find_by_name("House")
   end
 
   def test_it_loads_several_data
-
-    er = EnrollmentRepo.new
+    er = EnrollmentRepository.new
     er.load_data({
       :enrollment => {
         :kindergarten => "./test/data/kid.csv",
@@ -20,7 +34,7 @@ class EnrollmentRepoTest < Minitest::Test
   end
 
   def test_it_loads_data
-    er = EnrollmentRepo.new
+    er = EnrollmentRepository.new
     er.load_data({
       :enrollment => {
         :kindergarten => "./test/data/kid.csv"
@@ -28,5 +42,6 @@ class EnrollmentRepoTest < Minitest::Test
     })
     assert_equal "COLORADO", er.find_by_name("Colorado").name
   end
+
 
 end

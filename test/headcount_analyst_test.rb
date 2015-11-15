@@ -5,7 +5,7 @@ require './lib/enrollment'
 class HeadcountAnalystTest < Minitest::Test
   #District -> need repos (enrollment, economic, testing)
   #repos -> need records
-    # EnrollmentRepo needs Enrollment
+    # EnrollmentRepository needs Enrollment
     # Statewide testing needs StatewideTesting
     #Economic needs EconomicProfile
 
@@ -18,36 +18,35 @@ class HeadcountAnalystTest < Minitest::Test
     assert ha = HeadcountAnalyst.new(dr)
   end
 
-  def test_it_compares_kindergarten_rates_across_districts
-    skip
+  def test_it_compares_kindergarten_rates_between_two_districts
+
     e1 = Enrollment.new({name: "Dist_1",
-                        kindergarten_participation: {2010 => 1.0}})
+                        kindergarten_participation: {2010 => 0.4}})
     e2 = Enrollment.new({name: "Dist_2",
-                        kindergarten_participation: {2010 => 2.0}})
-    er = EnrollmentRepo.new
-    er.add_enrollments([e1,e2])
+                        kindergarten_participation: {2010 => 0.2}})
+    er = EnrollmentRepository.new([e1,e2])
+
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
 
     ha = HeadcountAnalyst.new(dr)
-    dist_1 = "Dist_1"
-    dist_2 = "Dist_2"
-    rate = ha.kindergarten_participation_rate_variation(dist_1, :against => dist_2)
-    assert_equal 2.0, rate
+    d1_name = "Dist_1"
+    d2_name = "Dist_2"
+
+    rate = ha.kindergarten_participation_rate_variation(d1_name, :against => d2_name)
+    assert_equal 2, rate
   end
 
   def test_it_calculates_kindergarten_participation_trends
-    skip
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0, 2014 => 2.0}})
     e2 = Enrollment.new({name: "Dist_2",
                         kindergarten_participation: {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
-    er = EnrollmentRepo.new
-    er.add_enrollments([e1,e2])
+    er = EnrollmentRepository.new([e1,e2])
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
     ha = HeadcountAnalyst.new(dr)
-    expected = {2010 => 2.0, 2014 => 0.5}
+    expected = {2010 => 0.5, 2014 => 2.0}
 
     assert_equal expected, ha.kindergarten_participation_rate_variation_trend('Dist_1', :against => 'Dist_2')
   end
@@ -60,7 +59,7 @@ class HeadcountAnalystTest < Minitest::Test
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0}})
 
     d = District.new(name:"Dist_1")
-    d.enrollment = e1
+    d.add_enrollment(e1)
     expected = {2010 => 1.0, 2012 => 2.0}
     assert_equal expected, ha.load_district_data(d, :enrollment,:kindergarten_participation_by_year )
   end
@@ -74,21 +73,20 @@ class HeadcountAnalystTest < Minitest::Test
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0}})
 
     d = District.new(name:"Dist_1")
-    d.enrollment = e1
+    d.add_enrollment(e1)
 
     assert_equal 1.5, ha.average(d, :enrollment, :kindergarten_participation_by_year)
   end
 
   def test_it_compares_kindergarten_and_high_school_enrollments
-    skip #needs enrollment to have a graduation_rate_by_year method
+    # skip #needs enrollment to have a graduation_rate_by_year method
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
-                        graduation_rate:            {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
+                        high_school_graduation:     {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
     e2 = Enrollment.new({name: "colorado",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
-                        graduation_rate:            {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
-    er = EnrollmentRepo.new
-    er.add_enrollments([e1,e2])
+                        high_school_graduation:     {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
+    er = EnrollmentRepository.new([e1,e2])
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
     ha = HeadcountAnalyst.new(dr)
@@ -103,7 +101,7 @@ class HeadcountAnalystTest < Minitest::Test
     e2 = Enrollment.new({name: "colorado",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
                         graduation_rate:            {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
-    er = EnrollmentRepo.new
+    er = EnrollmentRepository.new
     er.add_enrollments([e1,e2])
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
@@ -130,7 +128,7 @@ class HeadcountAnalystTest < Minitest::Test
     e4 = Enrollment.new({name: "Dist_4",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
                         graduation_rate:            {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
-    er = EnrollmentRepo.new
+    er = EnrollmentRepository.new
     er.add_enrollments([e1,e2,e3,e4])
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
@@ -153,7 +151,7 @@ class HeadcountAnalystTest < Minitest::Test
     e4 = Enrollment.new({name: "Dist_4",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
                         graduation_rate:            {2010 => 2.0, 2011 => 3.0, 2014 => 1.0}})
-    er = EnrollmentRepo.new
+    er = EnrollmentRepository.new
     er.add_enrollments([e1,e2,e3,e4])
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
