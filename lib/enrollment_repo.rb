@@ -10,15 +10,21 @@ class EnrollmentRepo
   end
 
   def load_data(data)
-    loaded_data = []
-    data[:enrollment].each do |filename|
-      loaded_data += Parser.parse(filename)
-    end
-    fun = loaded_data.group_by { |hash| hash[:name] }.map { |dist_name, dist_hashes| dist_hashes.reduce(:merge)}
     # binding.pry
-    fun.each do |name|
-      @enrollments << Enrollment.new(name)
+    fun = Parser.parse(data)
+    # loaded_data = []
+    # data.each do |filename|
+    #   loaded_data += Parser.parse(filename)
+    # end
+    # tst = loaded_data.dup
+    # binding.pry
+    # fun = loaded_data.group_by { |hash| hash[:name] }.map { |dist_name, dist_hashes| dist_hashes.reduce(:merge)}
+    # binding.pry
+    fun.each do |hash|
+      # binding.pry
+      @enrollments << Enrollment.new(hash)
     end
+    # binding.pry
   end
 
   def find_by_name(name)
