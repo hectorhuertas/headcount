@@ -1,13 +1,5 @@
 Location,TimeFrame,DataFormat,Data
 Colorado,2007,Percent,0.39465
-Colorado,2006,Percent,0.33677
 Colorado,2005,Percent,0.27807
 AGATE 300,2007,Percent,1
-AGATE 300,2006,Percent,#DIV/0!
-AGATE 300,2005,Percent,1
-AGATE 300,2004,Percent,1
-ALAMOSA RE-11J,2004,Percent,0
-ALAMOSA RE-11J,2008,Percent,0.99383
-ARICKAREE R-2,2007,Percent,N/A
-ARICKAREE R-2,2006,Percent,0.125
-ARICKAREE R-2,2005,Percent,0
+AGATE 300,2006,Percent,0.5
