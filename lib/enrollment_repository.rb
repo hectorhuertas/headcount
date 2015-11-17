@@ -1,4 +1,3 @@
-require 'csv'
 require 'pry'
 require_relative 'parser'
 require_relative 'enrollment'
@@ -12,6 +11,7 @@ class EnrollmentRepository
 
   def load_data(data)
     enrollments_data = Parser.enrollment(data[:enrollment])
+    # binding.pry
     enrollments_data.each do |hash|
       # binding.pry
       @enrollments << Enrollment.new(hash)
