@@ -65,7 +65,8 @@ class HeadcountAnalyst
     Stat.compare_trends(data_1, data_2)
   end
 
-  def load_district_data(district, area, type)
+  def load_district_data(d_name, area, type)
+    district = district_repository.find_by_name(d_name)
     district.send(area).send(type)
   end
 
