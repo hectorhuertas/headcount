@@ -14,6 +14,7 @@ module Parser
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
       { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
     end
+    # binding.pry
     raw_data = merge(lines)
     wrap(raw_data, :kindergarten_participation)
   end
