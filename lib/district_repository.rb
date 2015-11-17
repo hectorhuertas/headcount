@@ -1,5 +1,6 @@
-require './lib/district'
-require './lib/parser'
+require_relative 'district'
+require_relative 'parser'
+require_relative 'enrollment_repository'
 require 'pry'
 class DistrictRepository
   attr_reader :districts, :enrollment_repo

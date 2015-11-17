@@ -1,6 +1,7 @@
 require 'csv'
 require 'pry'
-require './lib/parser'
+require_relative 'parser'
+require_relative 'enrollment'
 class EnrollmentRepository
   attr_reader :enrollments
 

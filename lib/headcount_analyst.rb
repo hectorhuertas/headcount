@@ -1,4 +1,4 @@
-require './lib/stat'
+require_relative 'stat'
 
 class HeadcountAnalyst
   attr_reader :district_repository
@@ -18,7 +18,7 @@ class HeadcountAnalyst
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
-    avg_1 / avg_2
+    (avg_1 / avg_2).round(3)
     # general_variation(d1_name,
     #                   options[:against],
     #                   :enrollment,
@@ -36,7 +36,7 @@ class HeadcountAnalyst
       avg_1 = Stat.average(data_1)
       avg_2 = Stat.average(data_2)
 
-      avg_1 / avg_2
+      (avg_1 / avg_2).round(3)
   end
 
   def general_variation(d1_name, d2_name, area, type)
@@ -46,7 +46,7 @@ class HeadcountAnalyst
     data_1 = load_district_data(dist_1, area, type)
     data_2 = load_district_data(dist_2, area, type)
 
-    Stat.variation(data_1, data_2)
+    Stat.variation(data_1, data_2).round(3)
   end
 
   # def general_variance(d_name, area1, type1, area2, type2)
@@ -74,7 +74,7 @@ class HeadcountAnalyst
     data = load_district_data(district, area, type)
     sum = data.values.reduce(:+)
     count = data.size
-    sum / count
+    (sum / count).round(3)
   end
 
   def kindergarten_participation_against_high_school_graduation(d_name)

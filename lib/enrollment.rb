@@ -13,7 +13,7 @@ class Enrollment
   end
 
   def kindergarten_participation_in_year(year)
-    @kindergarten_participation[year]
+    @kindergarten_participation[year].round(3)
   end
 
   def graduation_rate_by_year
@@ -21,6 +21,6 @@ class Enrollment
   end
 
   def graduation_rate_in_year(year)
-    @high_school_graduation[year]
+    @high_school_graduation[year].round(3)
   end
 end
