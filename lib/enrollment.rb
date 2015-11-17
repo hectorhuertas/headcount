@@ -1,3 +1,4 @@
+require_relative 'stat'
 class Enrollment
   attr_reader :name
 
@@ -13,14 +14,15 @@ class Enrollment
   end
 
   def kindergarten_participation_in_year(year)
-    @kindergarten_participation[year].round(3)
+    @kindergarten_participation[year]
   end
 
   def graduation_rate_by_year
+    # binding.pry
     @high_school_graduation
   end
 
   def graduation_rate_in_year(year)
-    @high_school_graduation[year].round(3)
+    @high_school_graduation[year]
   end
 end

@@ -8,7 +8,7 @@ class ParserTest < Minitest::Test
 
   def kindergarten_test_data
     { 'COLORADO' => {
-      kindergarten_participation: { 2007 => 0.395,
+      kindergarten_participation: { 2007 => 0.394,
                                     2005 => 0.278 } },
       'AGATE 300' => {
         kindergarten_participation: { 2007 => 1.0,
@@ -26,7 +26,7 @@ class ParserTest < Minitest::Test
 
   def mixed_enrollment_test_data
     [{ name: 'COLORADO',
-       kindergarten_participation: { 2007 => 0.395,
+       kindergarten_participation: { 2007 => 0.394,
                                      2005 => 0.278 },
        high_school_graduation: { 2010 => 0.724,
                                  2011 => 0.739 } },
@@ -82,7 +82,7 @@ class ParserTest < Minitest::Test
 
   def test_frame_work
     input = { location: 'Colorado', timeframe: '2010', data: '0.3029' }
-    answer = { 'COLORADO' => { 2010 => 0.303 } }
+    answer = { 'COLORADO' => { 2010 => 0.302 } }
     assert_equal answer, Parser.frame_work(input)
   end
 
