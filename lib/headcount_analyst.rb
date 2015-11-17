@@ -97,33 +97,18 @@ class HeadcountAnalyst
       end
       # binding.pry
       (correlated / (district_repository.districts.count.to_f - 1)) > 0.7
-    else
+    elsif options[:against] != nil
+      district_names = options[:against]
+      #get districts form names
+      correlated = district_names.count do |d_name|
+        varience = kindergarten_participation_against_high_school_graduation(d_name)
+        correlates?(varience)
+      end
+      (correlated / (district_names.count.to_f)) > 0.7
+    elsif options[:for] != nil
       variance = kindergarten_participation_against_high_school_graduation(options[:for])
-
       correlates?(variance)
     end
-    # if options[:for]
-    #   if options[:for].upcase != 'STATEWIDE'
-    #     correlation = kindergarten_participation_against_high_school_graduation(options[:for])
-    #     if 0.6 < correlation && correlation < 1.5
-    #       true
-    #     end
-    #   else
-    #     passing = district_repository.districts.count{|d| kindergarten_participation_correlates_with_high_school_graduation(d) if d.name!='COLORADO'}
-    #     if (passing / district_repository.districts.size) > 0.7
-    #       true
-    #     else
-    #       false
-    #     end
-    #   end
-    # elsif options[:across]
-    #   passing = options[:across].count{|d| kindergarten_participation_correlates_with_high_school_graduation(d)}
-    #   if (passing / options[:across].size) > 0.7
-    #     true
-    #   else
-    #     false
-    #   end
-    # end
   end
 
   def correlates?(variance)

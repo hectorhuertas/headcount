@@ -171,4 +171,51 @@ class HeadcountAnalystTest < Minitest::Test
     assert ha.correlates?(1)
     refute ha.correlates?(2)
   end
+
+  def test_it_detects_positive_correlation_statewise
+    e1 = Enrollment.new({name: "Dist_1",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    e2 = Enrollment.new({name: "Dist_2",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    e3 = Enrollment.new({name: "Dist_3",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    e4 = Enrollment.new({name: "Dist_4",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
+                        high_school_graduation:     {2010 => 7.0, 2011 => 7.0, 2014 => 1.0}})
+    e5 = Enrollment.new({name: "colorado",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    er = EnrollmentRepository.new([e1,e2,e3,e4,e5])
+    dr = DistrictRepository.new
+    dr.load_repos({enrollment: er})
+    ha = HeadcountAnalyst.new(dr)
+    assert ha.kindergarten_participation_correlates_with_high_school_graduation(against: %w(Dist_1 Dist_2 Dist_3 Dist_4))
+  end
+
+  def test_it_detects_false_correlation_statewise
+    e1 = Enrollment.new({name: "Dist_1",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    e2 = Enrollment.new({name: "Dist_2",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    e3 = Enrollment.new({name: "Dist_3",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 7.0, 2012 => 7.0}})
+    e4 = Enrollment.new({name: "Dist_4",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 2.0},
+                        high_school_graduation:     {2010 => 7.0, 2011 => 7.0, 2014 => 1.0}})
+    e5 = Enrollment.new({name: "colorado",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 1.0},
+                        high_school_graduation:     {2010 => 1.0, 2012 => 1.0}})
+    er = EnrollmentRepository.new([e1,e2,e3,e4,e5])
+    dr = DistrictRepository.new
+    dr.load_repos({enrollment: er})
+    ha = HeadcountAnalyst.new(dr)
+    refute ha.kindergarten_participation_correlates_with_high_school_graduation(against: %w(Dist_1 Dist_2 Dist_3 Dist_4))
+  end
+
 end

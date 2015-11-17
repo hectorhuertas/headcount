@@ -47,4 +47,8 @@ class DistrictRepository
     end
     @districts = districts
   end
+
+  def find_all_matching(string)
+    districts.select { |district| district.name.match(/#{string.upcase}/)}
+  end
 end
