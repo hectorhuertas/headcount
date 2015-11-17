@@ -46,28 +46,29 @@ class HeadcountAnalystTest < Minitest::Test
   end
 
   def test_it_loads_data_for_a_given_district_and_info
-    dr = DistrictRepository.new
-    ha = HeadcountAnalyst.new(dr)
-
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0}})
 
+    er = EnrollmentRepository.new([e1])
+    dr = DistrictRepository.new
+    dr.load_repos({enrollment: er})
+    ha = HeadcountAnalyst.new(dr)
     d = District.new(name:"Dist_1")
-    d.add_enrollment(e1)
     expected = {2010 => 1.0, 2012 => 2.0}
     assert_equal expected, ha.load_district_data(d, :enrollment,:kindergarten_participation_by_year )
   end
 
 
   def test_it_returns_district_average
-    dr = DistrictRepository.new
-    ha = HeadcountAnalyst.new(dr)
 
     e1 = Enrollment.new({name: "Dist_1",
                         kindergarten_participation: {2010 => 1.0, 2012 => 2.0}})
-
+    er = EnrollmentRepository.new([e1])
+    dr = DistrictRepository.new
+    dr.load_repos({enrollment: er})
+    ha = HeadcountAnalyst.new(dr)
     d = District.new(name:"Dist_1")
-    d.add_enrollment(e1)
+    # d.add_enrollment(e1)
 
     assert_equal 1.5, ha.average(d, :enrollment, :kindergarten_participation_by_year)
   end

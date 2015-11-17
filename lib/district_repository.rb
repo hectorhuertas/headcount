@@ -1,6 +1,7 @@
 require_relative 'district'
 require_relative 'parser'
 require_relative 'enrollment_repository'
+require_relative 'stat'
 require 'pry'
 class DistrictRepository
   attr_reader :districts, :enrollment_repo

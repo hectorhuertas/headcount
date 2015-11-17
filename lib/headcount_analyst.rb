@@ -18,7 +18,7 @@ class HeadcountAnalyst
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
-    (avg_1 / avg_2).round(3)
+    Stat.round_decimal(avg_1 / avg_2)
     # general_variation(d1_name,
     #                   options[:against],
     #                   :enrollment,
@@ -36,7 +36,7 @@ class HeadcountAnalyst
       avg_1 = Stat.average(data_1)
       avg_2 = Stat.average(data_2)
 
-      (avg_1 / avg_2).round(3)
+      Stat.round_decimal(avg_1 / avg_2)
   end
 
   def general_variation(d1_name, d2_name, area, type)
@@ -46,7 +46,7 @@ class HeadcountAnalyst
     data_1 = load_district_data(dist_1, area, type)
     data_2 = load_district_data(dist_2, area, type)
 
-    Stat.variation(data_1, data_2).round(3)
+    Stat.round_decimal(Stat.variation(data_1, data_2))
   end
 
   # def general_variance(d_name, area1, type1, area2, type2)
@@ -66,7 +66,8 @@ class HeadcountAnalyst
   end
 
   def load_district_data(d_name, area, type)
-    district = district_repository.find_by_name(d_name)
+    # binding.pry
+    district = district_repository.find_by_name(d_name.name)
     district.send(area).send(type)
   end
 
@@ -75,7 +76,7 @@ class HeadcountAnalyst
     data = load_district_data(district, area, type)
     sum = data.values.reduce(:+)
     count = data.size
-    (sum / count).round(3)
+    Stat.round_decimal(sum / count)
   end
 
   def kindergarten_participation_against_high_school_graduation(d_name)
@@ -83,7 +84,7 @@ class HeadcountAnalyst
       kinder_variation = kindergarten_participation_rate_variation(d_name)
       graduation_variation = high_school_graduation_variation(d_name)
 
-      (kinder_variation / graduation_variation).round(3)
+      Stat.round_decimal(kinder_variation / graduation_variation)
       # binding.pry
   end
 

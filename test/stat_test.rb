@@ -3,6 +3,10 @@ require './lib/stat'
 
 class StatTest < Minitest::Test
 
+  def test_that_it_chops_to_three_decimals
+    assert_equal 3.494, Stat.round_decimal(3.4949999)
+  end
+
   def test_it_exist
     assert Stat
   end
