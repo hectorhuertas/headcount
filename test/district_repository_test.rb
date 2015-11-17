@@ -56,9 +56,9 @@ class DistrictRepositoryTest < Minitest::Test
     assert_equal 'WISCONSIN', dr.find_by_name('Wisconsin').name
   end
 
-  # def test_it_finds_all_matches_from_a_substring
-  #   dr = DistrictRepository.new
-  #   dr.create_districts(['Colorado', 'Alabama', 'Alticola'])
-  #   founded = dr.find_all_matching('col')
-  # end
+  def test_it_finds_all_matches_from_a_substring
+    dr = DistrictRepository.new
+    dr.create_districts(['Colorado', 'Alabama', 'Alticola'])
+    founded = dr.find_all_matching('col')
+  end
 end

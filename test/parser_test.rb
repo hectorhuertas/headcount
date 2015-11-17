@@ -42,6 +42,12 @@ class ParserTest < Minitest::Test
     assert_equal expected, Parser.kindergarten('./test/data/kid.csv')
   end
 
+  def test_it_parses_kindergarten_data_without_strange_values
+    skip
+    expected = kindergarten_test_data
+    assert_equal expected, Parser.kindergarten('./test/data/kid_weird.csv')
+  end
+
   def test_it_parses_high_school_data
     expected = high_school_graduation_test_data
     assert_equal expected, Parser.high_school_graduation('./test/data/high_school.csv')

@@ -1,5 +1,6 @@
-require './lib/district'
-require './lib/parser'
+require_relative 'district'
+require_relative 'parser'
+require_relative 'enrollment_repository'
 require 'pry'
 class DistrictRepository
   attr_reader :districts, :enrollment_repo
@@ -45,5 +46,9 @@ class DistrictRepository
       d
     end
     @districts = districts
+  end
+
+  def find_all_matching(string)
+    districts.select { |district| district.name.match(/#{string.upcase}/)}
   end
 end
