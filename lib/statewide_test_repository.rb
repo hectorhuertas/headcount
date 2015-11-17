@@ -9,7 +9,8 @@ class StatewideTestRepository
   end
 
   def load_data(data)
-    tests_data = Parser.st_test(data[:statewide_testing])
+    tests_data = StParser.st_test(data[:statewide_testing])
+    # binding.pry 
     create_new_STtests(tests_data)
   end
 
