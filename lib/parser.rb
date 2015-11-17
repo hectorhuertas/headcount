@@ -12,12 +12,7 @@ module Parser
 
   def self.kindergarten((filename))
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
-      { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
-      # if is_a_number?(row[:data])
-        { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
-      # else
-        # nil
-      # end
+      frame_work(row)
     end.compact
 
     raw_data = merge(lines)
@@ -26,8 +21,9 @@ module Parser
 
   def self.high_school_graduation(filename)
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
-      { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
-    end
+      frame_work(row)
+
+    end.compact
     raw_data = merge(lines)
     wrap(raw_data, :high_school_graduation)
   end
@@ -44,9 +40,15 @@ module Parser
     c = hash.map { |k, v| { name: k }.merge v }
   end
 
-  def self.is_a_number?(string)
-    return true if string.include?("0")
-    return false if string.to_f != 0
-    true
+  def self.is_not_a_number?(string)
+    string.start_with?("#", "N")
+  end
+
+  def self.frame_work(row)
+    if is_not_a_number?(row[:data])
+      nil
+    else
+      { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
+    end
   end
 end

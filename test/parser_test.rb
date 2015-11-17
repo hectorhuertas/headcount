@@ -43,7 +43,6 @@ class ParserTest < Minitest::Test
   end
 
   def test_it_parses_kindergarten_data_without_strange_values
-    skip
     expected = kindergarten_test_data
     assert_equal expected, Parser.kindergarten('./test/data/kid_weird.csv')
   end
@@ -51,6 +50,11 @@ class ParserTest < Minitest::Test
   def test_it_parses_high_school_data
     expected = high_school_graduation_test_data
     assert_equal expected, Parser.high_school_graduation('./test/data/high_school.csv')
+  end
+
+  def test_it_parses_high_school_data_without_strange_values
+    expected = high_school_graduation_test_data
+    assert_equal expected, Parser.high_school_graduation('./test/data/high_school_weird.csv')
   end
 
   def test_it_parses_single_type_enrollments
@@ -70,6 +74,23 @@ class ParserTest < Minitest::Test
     expected = mixed_enrollment_test_data
     assert_equal expected, Parser.enrollment(input)
   end
+
+  def test_is_not_a_number?
+    assert Parser.is_not_a_number?("N/A")
+    refute Parser.is_not_a_number?("3.493")
+  end
+
+  def test_frame_work
+    input = {:location => "Colorado", :timeframe => "2010", :data => "0.3029"}
+    answer = {"COLORADO" => {2010 => 0.303}}
+    assert_equal answer, Parser.frame_work(input)
+  end
+
+  def test_frame_work_returns_nil
+    input = {:location => "Colorado", :timeframe => "2010", :data => "N/A"}
+    assert_equal nil, Parser.frame_work(input)
+  end
+    # assert_equal nil, Parser.frame_work("N/A")
 
   #   def test_it_parses_another_single_type_enrollments
   #     skip

@@ -42,7 +42,7 @@ class DistrictRepository
     d_names = @enrollment_repo.enrollments.map(&:name).uniq
     districts = d_names.map do |n|
       d = District.new(name:n)
-      binding.pry
+      # binding.pry
       d.add_enrollment enrollment_repo.find_by_name(n)
       d
     end
