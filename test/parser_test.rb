@@ -29,12 +29,12 @@ class ParserTest < Minitest::Test
        kindergarten_participation: { 2007 => 0.395,
                                      2005 => 0.278 },
        high_school_graduation: { 2010 => 0.724,
-                                 2011 => 0.739 } } ,
+                                 2011 => 0.739 } },
      { name: 'AGATE 300',
-      kindergarten_participation: { 2007 => 1.0,
-                                    2006 => 0.5 },
-      high_school_graduation: { 2011 => 0.8,
-                                2012 => 0.6 } } ]
+       kindergarten_participation: { 2007 => 1.0,
+                                     2006 => 0.5 },
+       high_school_graduation: { 2011 => 0.8,
+                                 2012 => 0.6 } }]
   end
 
   def test_it_parses_kindergarten_data
@@ -60,11 +60,11 @@ class ParserTest < Minitest::Test
   def test_it_parses_single_type_enrollments
     input = { high_school_graduation: './test/data/high_school.csv' }
     expected = [{ name: 'COLORADO',
-      high_school_graduation: { 2010 => 0.724,
-                                2011 => 0.739 }},
+                  high_school_graduation: { 2010 => 0.724,
+                                            2011 => 0.739 } },
                 { name: 'AGATE 300',
                   high_school_graduation: { 2011 => 0.8,
-                                            2012 => 0.6 } } ]
+                                            2012 => 0.6 } }]
     assert_equal expected, Parser.enrollment(input)
   end
 
@@ -76,38 +76,18 @@ class ParserTest < Minitest::Test
   end
 
   def test_is_not_a_number?
-    assert Parser.is_not_a_number?("N/A")
-    refute Parser.is_not_a_number?("3.493")
+    assert Parser.is_not_a_number?('N/A')
+    refute Parser.is_not_a_number?('3.493')
   end
 
   def test_frame_work
-    input = {:location => "Colorado", :timeframe => "2010", :data => "0.3029"}
-    answer = {"COLORADO" => {2010 => 0.303}}
+    input = { location: 'Colorado', timeframe: '2010', data: '0.3029' }
+    answer = { 'COLORADO' => { 2010 => 0.303 } }
     assert_equal answer, Parser.frame_work(input)
   end
 
   def test_frame_work_returns_nil
-    input = {:location => "Colorado", :timeframe => "2010", :data => "N/A"}
+    input = { location: 'Colorado', timeframe: '2010', data: 'N/A' }
     assert_equal nil, Parser.frame_work(input)
   end
-    # assert_equal nil, Parser.frame_work("N/A")
-
-  #   def test_it_parses_another_single_type_enrollments
-  #     skip
-  #   end
-  #
-  #   def test_it_parses_single_area_data
-  #     skip
-  #   end
-  #
-  #   def test_it_parses_complex_area_data
-  #     skip
-  # end
-  #
-  #   def test_it_merges_info_of_a_hash
-  #     skip
-  #   end
-
-  # def test_it_calls_correct_parser
-  # end
 end

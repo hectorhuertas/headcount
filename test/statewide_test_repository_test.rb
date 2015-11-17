@@ -26,12 +26,32 @@ class StatewideTestRepositoryTest < Minitest::Test
   end
 
   def test_creates_new_STtest
-    skip
     str = StatewideTestRepository.new
-    tests_data = [{ name: 'COLORADO',
-            '3' => { 2008 => { math: 0.857, reading: 0.866, writing: 0.671 },
-                     2009 => { math: 0.824, reading: 0.862, writing: 0.706 } } }]
+    tests_data = [{name: "yeah"}]
     str.create_new_STtests(tests_data)
-    assert_equal "COLORADO", str.find_by_name("colorado").name
+    assert_equal "YEAH", str.find_by_name("yeah").name
+  end
+
+  def test_creates_another_new_STtest
+    str = StatewideTestRepository.new
+    tests_data = [{name: "bob"}]
+    str.create_new_STtests(tests_data)
+    assert_equal "BOB", str.find_by_name("bob").name
+  end
+
+  def test_creates_several_STtest
+    str = StatewideTestRepository.new
+    tests_data = [{name: "yeah"},{name: "bob"} ]
+    str.create_new_STtests(tests_data)
+    assert_equal "YEAH", str.find_by_name("yeah").name
+    assert_equal "BOB", str.find_by_name("bob").name
+  end
+
+  def test_creates_different_several_STtest
+    str = StatewideTestRepository.new
+    tests_data = [{name: "one"},{name: "two"} ]
+    str.create_new_STtests(tests_data)
+    assert_equal "ONE", str.find_by_name("one").name
+    assert_equal "TWO", str.find_by_name("two").name
   end
 end
