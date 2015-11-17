@@ -1,4 +1,4 @@
-require './lib/stat'
+require_relative 'stat'
 
 class HeadcountAnalyst
   attr_reader :district_repository
@@ -18,11 +18,25 @@ class HeadcountAnalyst
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
-    avg_1 / avg_2
+    (avg_1 / avg_2).round(3)
     # general_variation(d1_name,
     #                   options[:against],
     #                   :enrollment,
     #                   :kindergarten_participation_by_year)
+  end
+
+  def high_school_graduation_variation(d1_name, options = {against: 'colorado'})
+      d2_name = options[:against]
+      dist_1 = district_repository.find_by_name(d1_name)
+      dist_2 = district_repository.find_by_name(d2_name)
+
+      data_1 = dist_1.enrollment.graduation_rate_by_year
+      data_2 = dist_2.enrollment.graduation_rate_by_year
+
+      avg_1 = Stat.average(data_1)
+      avg_2 = Stat.average(data_2)
+
+      (avg_1 / avg_2).round(3)
   end
 
   def general_variation(d1_name, d2_name, area, type)
@@ -32,7 +46,7 @@ class HeadcountAnalyst
     data_1 = load_district_data(dist_1, area, type)
     data_2 = load_district_data(dist_2, area, type)
 
-    Stat.variation(data_1, data_2)
+    Stat.variation(data_1, data_2).round(3)
   end
 
   # def general_variance(d_name, area1, type1, area2, type2)
@@ -60,55 +74,45 @@ class HeadcountAnalyst
     data = load_district_data(district, area, type)
     sum = data.values.reduce(:+)
     count = data.size
-    sum / count
-    # binding.pry
-    # Stat.average(data)
+    (sum / count).round(3)
   end
 
   def kindergarten_participation_against_high_school_graduation(d_name)
-      dist = district_repository.find_by_name(d_name)
-      state = district_repository.find_by_name('colorado')
-      #
-      #
-      # kinder_average = average(dist, :enrollment, :kindergarten_participation_by_year)
-      # kinder_state = average(state, :enrollment, :kindergarten_participation_by_year)
-      # kinder_variation = kinder_average / kinder_state
-      # kinder_variation = general_variation
+      # binding.pry
+      kinder_variation = kindergarten_participation_rate_variation(d_name)
+      graduation_variation = high_school_graduation_variation(d_name)
 
-      # graduation_average = average(dist, :enrollment,:kindergarten_participation_by_year)
-      # graduation_state = average(state, :enrollment, :kindergarten_participation_by_year)
-      # graduation_variation = graduation_average / graduation_state
-      graduation_average = average(dist, :enrollment,:graduation_rate_by_year)
-      graduation_state = average(state, :enrollment, :graduation_rate_by_year)
-      graduation_variation = graduation_average / graduation_state
-
-      kinder_variation / graduation_variation
-      # kindergarten_participation_rate_variation_trend(d_name) / graduation_variation
+      (kinder_variation / graduation_variation).round(3)
+      # binding.pry
   end
 
   def kindergarten_participation_correlates_with_high_school_graduation(options)
-    if options[:for]
-      if options[:for].upcase != 'COLORADO'
-        correlation = kindergarten_participation_against_high_school_graduation(options[:for])
-        if 0.6 < correlation && correlation < 1.5
-          true
-        end
-      else
-        passing = district_repository.districts.count{|d| kindergarten_participation_correlates_with_high_school_graduation(d) if d.name!='COLORADO'}
-        if (passing / district_repository.districts.size) > 0.7
-          true
-        else
-          false
-        end
+    if options[:for] == 'STATEWIDE'
+      correlated = district_repository.districts.count do |dist|
+        next false if dist.name == 'COLORADO'
+        # binding.pry
+        varience = kindergarten_participation_against_high_school_graduation(dist.name)
+        correlates?(varience)
+        # false if dist .name == 'COLORADO'
       end
-    elsif options[:across]
-      passing = options[:across].count{|d| kindergarten_participation_correlates_with_high_school_graduation(d)}
-      if (passing / options[:across].size) > 0.7
-        true
-      else
-        false
+      # binding.pry
+      (correlated / (district_repository.districts.count.to_f - 1)) > 0.7
+    elsif options[:against] != nil
+      district_names = options[:against]
+      #get districts form names
+      correlated = district_names.count do |d_name|
+        varience = kindergarten_participation_against_high_school_graduation(d_name)
+        correlates?(varience)
       end
+      (correlated / (district_names.count.to_f)) > 0.7
+    elsif options[:for] != nil
+      variance = kindergarten_participation_against_high_school_graduation(options[:for])
+      correlates?(variance)
     end
+  end
+
+  def correlates?(variance)
+    0.6 < variance && variance < 1.5
   end
 
 

@@ -13,8 +13,13 @@ module Parser
   def self.kindergarten((filename))
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
       { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
-    end
-    # binding.pry
+      # if is_a_number?(row[:data])
+        { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
+      # else
+        # nil
+      # end
+    end.compact
+
     raw_data = merge(lines)
     wrap(raw_data, :kindergarten_participation)
   end
@@ -37,5 +42,11 @@ module Parser
 
   def self.wrap_name(hash)
     c = hash.map { |k, v| { name: k }.merge v }
+  end
+
+  def self.is_a_number?(string)
+    return true if string.include?("0")
+    return false if string.to_f != 0
+    true
   end
 end
