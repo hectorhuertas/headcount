@@ -22,8 +22,8 @@ module Parser
   def self.high_school_graduation(filename)
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
       frame_work(row)
-
     end.compact
+
     raw_data = merge(lines)
     wrap(raw_data, :high_school_graduation)
   end
@@ -48,7 +48,7 @@ module Parser
     if is_not_a_number?(row[:data])
       nil
     else
-      { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
+      { row[:location].upcase => { row[:timeframe].to_i => Stat.round_decimal(row[:data]) } }
     end
   end
 end

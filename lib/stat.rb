@@ -1,4 +1,8 @@
 module Stat
+  def self.round_decimal(number)
+    (1000 * number.to_f).truncate.to_f / 1000
+  end
+  
 
   def self.variation(data_1, data_2)
     average(data_1) / average(data_2)
@@ -19,7 +23,7 @@ module Stat
     common.each {|year| common_trend_2[year]=trend_2[year]}
 
     common_trend_1.merge(common_trend_2) do |year, av1, av2|
-      (av1/av2).round(3)
+      round_decimal(av1/av2)
     end.sort.to_h
   end
 end
