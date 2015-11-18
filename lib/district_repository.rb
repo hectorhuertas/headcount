@@ -1,13 +1,14 @@
 require_relative 'district'
 require_relative 'parser'
 require_relative 'enrollment_repository'
-require_relative 'stat'
+# require_relative 'statewide_test_repository'
 require 'pry'
 class DistrictRepository
-  attr_reader :districts, :enrollment_repo
+  attr_reader :districts, :enrollment_repo, :state_repo
 
   def initialize
     @enrollment_repo = EnrollmentRepository.new
+    @state_repo = StatewideTestRepository.new
     @districts = []
   end
 
@@ -19,6 +20,8 @@ class DistrictRepository
     # Parser.parse(data[:enrollment][:kindergarten])
       enrollment_repo.load_data(data)
       # binding.pry
+      state_repo.load_data(data)
+
       create_districts_from_repos!
 
   end
@@ -40,11 +43,14 @@ class DistrictRepository
   end
 
   def create_districts_from_repos!
-    d_names = @enrollment_repo.enrollments.map(&:name).uniq
-    districts = d_names.map do |n|
+    d_names = []
+    d_names << @enrollment_repo.enrollments.map(&:name).uniq
+    d_names << @state_repo.tests.map(&:name).uniq
+    districts = d_names.flatten.map do |n|
       d = District.new(name:n)
       # binding.pry
       d.add_enrollment enrollment_repo.find_by_name(n)
+      d.add_tests state_repo.find_by_name(n)
       d
     end
     @districts = districts

@@ -1,4 +1,4 @@
-require_relative 'parser'
+require_relative 'st_parser'
 require_relative 'statewide_test'
 
 class StatewideTestRepository
@@ -10,7 +10,7 @@ class StatewideTestRepository
 
   def load_data(data)
     tests_data = StParser.st_test(data[:statewide_testing])
-    # binding.pry 
+    # binding.pry
     create_new_STtests(tests_data)
   end
 

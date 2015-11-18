@@ -1,6 +1,4 @@
 require 'csv'
-require 'pry-rescue'
-
 module StParser
 
   # def self.merge(lines)
