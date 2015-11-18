@@ -37,7 +37,6 @@ class StParserTest < Minitest::Test
       writing: './test/data/writing.csv' }
     expected = full_test_data
     actual = StParser.st_test(input)
-    # binding.pry
     assert_equal expected, actual
   end
 
@@ -81,4 +80,25 @@ class StParserTest < Minitest::Test
     expected = race_data
     assert_equal expected, actual
   end
+
+  def test_not_a_number_for_st_parser
+    assert StParser.not_a_number?("L")
+    assert StParser.not_a_number?("D")
+    refute StParser.not_a_number?("3.392")
+  end
+
+  def test_it_parses_with_weird_data
+    input = { math: './test/data/weird_race.csv',
+              reading: './test/data/weird_race.csv',
+              writing: './test/data/weird_race.csv'
+    }
+    actual = StParser.avg_proficiency(input)
+    expected = race_data
+    assert_equal expected, actual
+  end
+
+    def test_it_parses_third_and_eighth_grade_data
+      expected = third_and_eighth_grade_test_data
+      assert_equal expected, StParser.third_and_eighth_grade('./test/data/weird_3g.csv')
+    end
 end
