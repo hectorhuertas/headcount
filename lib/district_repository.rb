@@ -32,7 +32,8 @@ class DistrictRepository
   end
 
   def load_repos(repos)
-    @enrollment_repo = repos[:enrollment]
+    @enrollment_repo = repos[:enrollment] if repos[:enrollment]
+    @state_repo = repos[:statewide_test] if repos[:statewide_test]
     #create districts based of the names of the repos names
     create_districts_from_repos!
   end
@@ -41,7 +42,7 @@ class DistrictRepository
     d_names = []
     d_names << @enrollment_repo.enrollments.map(&:name).uniq
     d_names << @state_repo.statewide_test.map(&:name).uniq
-    districts = d_names.flatten.map do |n|
+    districts = d_names.flatten.uniq.map do |n|
       d = District.new(name:n)
       # binding.pry
       d.add_enrollment enrollment_repo.find_by_name(n)

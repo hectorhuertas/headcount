@@ -124,5 +124,31 @@ class DistrictRepositoryTest < Minitest::Test
     dr = DistrictRepository.new
     dr.create_districts(%w(Colorado Alabama Alticola))
     founded = dr.find_all_matching('col')
+    assert_equal 2, founded.size
   end
+
+  def test_it_loads_enrollment_repos
+    e1 = Enrollment.new({name: "Dist_1",
+                        kindergarten_participation: {2010 => 1.0, 2012 => 2.0}})
+
+    er = EnrollmentRepository.new([e1])
+    dr = DistrictRepository.new
+    dr.load_repos({enrollment: er})
+    ha = HeadcountAnalyst.new(dr)
+    assert dr.enrollment_repo.find_by_name("Dist_1")
+  end
+
+  def test_it_loads_statewide_test_repos
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 0.6, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 0.3, reading: 0.5, writing: 0.7 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    assert dr.find_by_name("bob").statewide_test
+  end
+
 end

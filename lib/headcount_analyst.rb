@@ -119,12 +119,30 @@ class HeadcountAnalyst
 
   def top_statewide_test_year_over_year_growth(options)
     validate_options(options)
+    if options[:top]
+      sorted = district_repository.districts.sort_by do |district|
+        statewide_test_year_over_year_growth(district, options)
+      end
+      sorted.reverse.take(options[:top])
+    else
+    top = district_repository.districts.max_by do |district|
+      statewide_test_year_over_year_growth(district, options)
+    end
+    [top.name, statewide_test_year_over_year_growth(top, options)]
+    end
+  end
+
+  def statewide_test_year_over_year_growth(dist, options)
+    years = dist.statewide_test.proficient_by_grade(options[:grade]).keys
+    actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[-1])
+    old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[0])
+    period = years[-1] - years[0]
+    (actual - old) / period
   end
 
   def validate_options(options)
     custom_error = "InsufficientInformationError:
                     A grade must be provided to answer this question"
     raise custom_error unless [3,8].include?(options[:grade])
-
   end
 end
