@@ -134,15 +134,44 @@ class HeadcountAnalyst
 
   def statewide_test_year_over_year_growth(dist, options)
     years = dist.statewide_test.proficient_by_grade(options[:grade]).keys
-    actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[-1])
-    old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[0])
+    return 0 if years.size < 2
+    if options[:subject]
+      actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[-1])
+      old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[0])
+    else
+      actual = weighted_average(dist,options, years[-1])
+      old = weighted_average(dist,options, years[0])
+      # binding.pry
+    end
     period = years[-1] - years[0]
     (actual - old) / period
   end
 
+  def weighted_average(dist,options,year)
+    custom_error = "WeightError: Weigths must add to 1"
+    raise custom_error if (options[:weighting] && (options[:weighting][:math] + options[:weighting][:reading] + options[:weighting][:writing]) != 1)
+
+      math = dist.statewide_test.proficient_for_subject_by_grade_in_year(:math, options[:grade], year)
+      reading = dist.statewide_test.proficient_for_subject_by_grade_in_year(:reading, options[:grade], year)
+      writing = dist.statewide_test.proficient_for_subject_by_grade_in_year(:writing, options[:grade], year)
+
+    if options[:weighting]
+      math_weight = options[:weighting][:math]
+      reading_weight = options[:weighting][:reading]
+      writing_weight = options[:weighting][:writing]
+      sum = math * math_weight + reading * reading_weight + writing * writing_weight
+      # binding.pry
+    else
+      (math + reading + writing)/3.0
+    end
+
+  end
+
   def validate_options(options)
-    custom_error = "InsufficientInformationError:
+    information_error = "InsufficientInformationError:
                     A grade must be provided to answer this question"
-    raise custom_error unless [3,8].include?(options[:grade])
+    grade_error = "UnknownDataError: #{options[:grade]} is not a known grade"
+    raise information_error unless options[:grade]
+    raise grade_error unless [3,8].include?(options[:grade])
   end
 end
