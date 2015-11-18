@@ -117,5 +117,14 @@ class HeadcountAnalyst
     0.6 < variance && variance < 1.5
   end
 
+  def top_statewide_test_year_over_year_growth(options)
+    validate_options(options)
+  end
 
+  def validate_options(options)
+    custom_error = "InsufficientInformationError:
+                    A grade must be provided to answer this question"
+    raise custom_error unless [3,8].include?(options[:grade])
+
+  end
 end

@@ -63,9 +63,9 @@ module StParser
 
   def self.merge_years(lines)
     lines.reduce{|result,line| result.merge(line){|k,v1,v2|
-      v1.merge(v2){|k,v1,v2| v1.merge(v2){|k,v1,v2|
-        # binding.pry
-        v1.merge(v2)
+      v1.merge(v2){|k,v1,v2|
+        v1.merge(v2){|k,v1,v2|
+          v1.merge(v2)
         }}
       }}
   end
