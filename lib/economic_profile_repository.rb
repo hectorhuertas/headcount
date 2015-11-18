@@ -14,7 +14,7 @@ class EconomicProfileRepository
   end
 
   def find_by_name(name)
-    tests.find{|test| test.name == name.upcase}
+    statewide_test.find{|test| test.name == name.upcase}
   end
 
 

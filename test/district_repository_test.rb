@@ -33,7 +33,7 @@ class DistrictRepositoryTest < Minitest::Test
                    third_grade: './test/data/3g.csv'
                  })
     assert dr.find_by_name('COLORADO')
-    assert dr.find_by_name('COLORADO').tests
+    assert dr.find_by_name('COLORADO').statewide_test
   end
 
   def test_it_loads_and_eighth_grade_data
@@ -42,7 +42,7 @@ class DistrictRepositoryTest < Minitest::Test
                    eighth_grade: './test/data/8g.csv'
                  })
     assert_equal 'CHICAGO', dr.find_by_name('CHICAGO').name
-    assert dr.find_by_name('CHICAGO').tests
+    assert dr.find_by_name('CHICAGO').statewide_test
   end
 
   def test_it_loads_proficiency
@@ -71,13 +71,14 @@ class DistrictRepositoryTest < Minitest::Test
                    writing: './test/data/writing.csv'
                  })
     assert dr.find_by_name('COLORADO')
-    assert dr.find_by_name('COLORADO').tests
+    assert dr.find_by_name('COLORADO').statewide_test
     assert dr.find_by_name('Madrid')
     assert dr.find_by_name('London')
     assert dr.find_by_name('turing')
     assert dr.find_by_name('Academy 20')
     assert_equal 'CHICAGO', dr.find_by_name('CHICAGO').name
-    assert dr.find_by_name('CHICAGO').tests
+    assert dr.find_by_name('CHICAGO').statewide_test
+    # binding.pry
   end
 
   def test_find_by_name

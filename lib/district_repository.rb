@@ -40,12 +40,12 @@ class DistrictRepository
   def create_districts_from_repos!
     d_names = []
     d_names << @enrollment_repo.enrollments.map(&:name).uniq
-    d_names << @state_repo.tests.map(&:name).uniq
+    d_names << @state_repo.statewide_test.map(&:name).uniq
     districts = d_names.flatten.map do |n|
       d = District.new(name:n)
       # binding.pry
       d.add_enrollment enrollment_repo.find_by_name(n)
-      d.add_tests state_repo.find_by_name(n)
+      d.add_statewide_test state_repo.find_by_name(n)
       d
     end
     @districts = districts

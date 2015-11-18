@@ -1,17 +1,17 @@
 class District
-  attr_reader :name, :enrollment, :tests
+  attr_reader :name, :enrollment, :statewide_test
 
   def initialize(name)
     @name = name.values.first.upcase
     @enrollment = []
-    @tests = []
+    @statewide_test = []
   end
 
   def add_enrollment(enrollment)
     @enrollment = enrollment
   end
 
-  def add_tests(tests)
-    @tests = tests
+  def add_statewide_test(statewide_test)
+    @statewide_test = statewide_test
   end
 end
