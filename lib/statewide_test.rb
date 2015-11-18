@@ -33,6 +33,7 @@ class StatewideTest
 
   def proficient_for_subject_by_grade_in_year(subject, grade, year)
     proficient_by_grade(grade)[year][subject]
+    # binding.pry
   end
 
   def proficient_for_subject_by_race_in_year(subject, race, year)

@@ -10,3 +10,4 @@ filter weird values on the csv data
   *create new test files with the weird values
   *create a method called find_all_matchs!!
   *round answers coming out of stats
+  * put spaces in tests between assertions

@@ -10,19 +10,18 @@ class Enrollment
   end
 
   def kindergarten_participation_by_year
-    @kindergarten_participation
+    Stat.truncating(@kindergarten_participation)
   end
 
   def kindergarten_participation_in_year(year)
-    @kindergarten_participation[year]
+    Stat.round_decimal(@kindergarten_participation[year])
   end
 
   def graduation_rate_by_year
-    # binding.pry
-    @high_school_graduation
+    Stat.truncating(@high_school_graduation)
   end
 
   def graduation_rate_in_year(year)
-    @high_school_graduation[year]
+    Stat.round_decimal(@high_school_graduation[year])
   end
 end
