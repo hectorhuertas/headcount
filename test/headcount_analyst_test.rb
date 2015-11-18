@@ -2,7 +2,6 @@ require 'minitest/autorun'
 require './lib/headcount_analyst'
 require './lib/enrollment'
 require './lib/statewide_test'
-require 'pry-rescue'
 
 class HeadcountAnalystTest < Minitest::Test
   def test_it_exist
