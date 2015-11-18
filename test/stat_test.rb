@@ -3,8 +3,20 @@ require './lib/stat'
 
 class StatTest < Minitest::Test
 
-  def test_that_it_chops_to_three_decimals
+  def test_round_decimal_truncates_at_three_decimals
     assert_equal 3.494, Stat.round_decimal(3.4949999)
+  end
+
+  def test_truncating_takes_hash
+    input = {2010 => 1.239393}
+    result = {2010 => 1.239}
+    assert_equal result, Stat.truncating(input)
+  end
+
+  def test_truncating_take_multiple_values
+    input = {2010 => 1.2393, 2011 => 2.3939}
+    result = {2010 => 1.239, 2011 => 2.393}
+    assert_equal result, Stat.truncating(result) 
   end
 
   def test_it_exist

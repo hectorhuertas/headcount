@@ -2,7 +2,12 @@ module Stat
   def self.round_decimal(number)
     (1000 * number.to_f).truncate.to_f / 1000
   end
-  
+
+  def self.truncating(hash)
+    hash.map do |key, value|
+      [key, round_decimal(value)]
+    end.to_h
+  end
 
   def self.variation(data_1, data_2)
     average(data_1) / average(data_2)
