@@ -26,6 +26,16 @@ class StatewideTestTest < Minitest::Test
     assert_equal expected, st.proficient_by_grade(3)
   end
 
+  def test_proficient_by_grade_3_truncated
+    st = StatewideTest.new(name: 'two',
+                           third_grade: { 2008 => { math: 0.69749, reading: 0.70339, writing: 0.5013 },
+                                          2009 => { math: 0.691492, reading: 0.726203, writing: 0.5365 } })
+    expected ={ 2008 => { math: 0.697, reading: 0.703, writing: 0.501 },
+                2009 => { math: 0.691, reading: 0.726, writing: 0.536 } }
+    assert_equal 'TWO', st.name
+    assert_equal expected, st.proficient_by_grade(3)
+  end
+
   def test_proficient_by_grade_8
     st = StatewideTest.new(name: 'two', eighth_grade: { 2008 => { math: 0.697 } } )
     expected ={ 2008 => { math: 0.697 } }
@@ -33,9 +43,23 @@ class StatewideTestTest < Minitest::Test
     assert_equal expected, st.proficient_by_grade(8)
   end
 
+  def test_proficient_by_grade_8_truncated
+    st = StatewideTest.new(name: 'two', eighth_grade: { 2008 => { math: 0.38282 } } )
+    expected ={ 2008 => { math: 0.382 } }
+    assert_equal 'TWO', st.name
+    assert_equal expected, st.proficient_by_grade(8)
+  end
+
   def test_proficient_by_race_or_ethnicity
     st = StatewideTest.new(name: 'two', Asian: {2011 => { math: 0.709, reading: 0.6, writing: 0.2 }} )
     expected ={ 2011 => { math: 0.709, reading: 0.6, writing: 0.2 } }
+    assert_equal 'TWO', st.name
+    assert_equal expected, st.proficient_by_race_or_ethnicity(:asian)
+  end
+
+  def test_proficient_by_race_or_ethnicity_truncated
+    st = StatewideTest.new(name: 'two', Asian: {2011 => { math: 0.709, reading: 0.6383, writing: 0.2394 }} )
+    expected ={ 2011 => { math: 0.709, reading: 0.638, writing: 0.239 } }
     assert_equal 'TWO', st.name
     assert_equal expected, st.proficient_by_race_or_ethnicity(:asian)
   end
@@ -50,6 +74,13 @@ class StatewideTestTest < Minitest::Test
   def test_proficient_for_subject_by_race_in_year
     st = StatewideTest.new(name: 'two', Asian: {2011 => { math: 0.709, reading: 0.6, writing: 0.2 }} )
     expected = 0.6
+    assert_equal 'TWO', st.name
+    assert_equal expected, st.proficient_for_subject_by_race_in_year(:reading, :asian, 2011)
+  end
+
+  def test_proficient_for_subject_by_race_in_year_with_truncated
+    st = StatewideTest.new(name: 'two', Asian: {2011 => { math: 0.709, reading: 0.60458, writing: 0.2 }} )
+    expected = 0.604
     assert_equal 'TWO', st.name
     assert_equal expected, st.proficient_for_subject_by_race_in_year(:reading, :asian, 2011)
   end

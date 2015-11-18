@@ -81,8 +81,8 @@ class ParserTest < Minitest::Test
   end
 
   def test_frame_work
-    input = { location: 'Colorado', timeframe: '2010', data: '0.3029' }
-    answer = { 'COLORADO' => { 2010 => 0.302 } }
+    input = { location: 'Colorado', timeframe: '2010', data: '0.3023' }
+    answer = { 'COLORADO' => { 2010 => 0.3023 } }
     assert_equal answer, Parser.frame_work(input)
   end
 

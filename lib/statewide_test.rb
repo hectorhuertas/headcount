@@ -1,3 +1,4 @@
+require_relative 'stat'
 class StatewideTest
   # attr_reader :name
   def initialize(data)
@@ -11,16 +12,17 @@ class StatewideTest
 
   def proficient_by_grade(grade)
     if grade == 3
-      @data[:third_grade]
+      answer = @data[:third_grade]
     elsif grade == 8
-      @data[:eighth_grade]
+      answer = @data[:eighth_grade]
     else
       raise ArgumentError
     end
+    Stat.nested_truncating(answer)
   end
 
   def proficient_by_race_or_ethnicity(race)
-    case race
+    answer = case race
     when :asian            then @data[:Asian]
     when :black            then @data[:Black]
     when :pacific_islander then @data[:"Hawaian/Pacific Islander"]
@@ -29,14 +31,14 @@ class StatewideTest
     when :two_or_more      then @data[:"Two or more"]
     when :white            then @data[:White]
     end
+    Stat.nested_truncating(answer)
   end
 
   def proficient_for_subject_by_grade_in_year(subject, grade, year)
     proficient_by_grade(grade)[year][subject]
-    # binding.pry
   end
 
   def proficient_for_subject_by_race_in_year(subject, race, year)
-    proficient_by_race_or_ethnicity(race)[year][subject]
+    Stat.round_decimal(proficient_by_race_or_ethnicity(race)[year][subject])
   end
 end

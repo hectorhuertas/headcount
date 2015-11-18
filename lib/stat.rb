@@ -9,6 +9,13 @@ module Stat
     end.to_h
   end
 
+  def self.nested_truncating(hash)
+    hash.map do |key, value|
+      new_value = truncating(value)
+      [key, new_value]
+    end.to_h
+  end
+
   def self.variation(data_1, data_2)
     average(data_1) / average(data_2)
   end

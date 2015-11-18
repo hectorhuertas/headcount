@@ -48,7 +48,7 @@ module Parser
     if is_not_a_number?(row[:data])
       nil
     else
-      { row[:location].upcase => { row[:timeframe].to_i => Stat.round_decimal(row[:data]) } }
+      { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f } }
     end
   end
 end
