@@ -9,15 +9,15 @@ class StatewideTestRepository
   end
 
   def load_data(data)
-    tests_data = StParser.st_test(data[:statewide_testing])
-    # binding.pry
-    create_new_STtests(tests_data)
+    if data[:statewide_testing]
+      tests_data = StParser.st_test(data[:statewide_testing])
+      create_new_STtests(tests_data)
+    end
   end
 
   def find_by_name(name)
-    tests.find{|test| test.name == name.upcase}
+    tests.find { |test| test.name == name.upcase }
   end
-
 
   def create_new_STtests(tests_data)
     tests_data.each do |test_data|

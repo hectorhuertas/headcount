@@ -1,43 +1,23 @@
 require 'csv'
 module StParser
 
-  # def self.merge(lines)
-  #   lines = merge_year_data(lines)
-  #   # binding.pry
-  #   # lines.reduce({}) { |result, line| result.merge(line) { |_k, v1, v2| v1.merge v2 } }
-  # end
-
-
-
-  #
-  def self.wrap(raw_data, key_info)
-    raw_data.reduce({}) { |result, (k, v)| result[k] = { key_info => v }; result }
-  end
-  #
-  def self.wrap_name(hash)
-    c = hash.map { |k, v| { name: k }.merge v }
-  end
-  #
-  # def self.is_not_a_number?(string)
-  #   string.start_with?("#", "N")
-  # end
-  #
-  # def self.frame_work(row)
-  #   if is_not_a_number?(row[:data])
-  #     nil
-  #   else
-  #     { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f.round(3) } }
-  #   end
-  # end
-
   def self.st_test(data)
-    third_grade = third_grade(data[:third_grade], :third_grade)
-    eighth_grade = eighth_grade(data[:eighth_grade], :eighth_grade)
-    proficiency = avg_proficiency({math: data[:math], reading: data[:reading], writing: data[:writing]})
-    e =[third_grade, eighth_grade, proficiency].reduce do |result, hash|
+    array = []
+    array << third_grade(data[:third_grade], :third_grade) if data[:third_grade]
+    array << eighth_grade(data[:eighth_grade], :eighth_grade) if data[:eighth_grade]
+    array << avg_proficiency({math: data[:math], reading: data[:reading], writing: data[:writing]}) if (data[:math] && data[:reading] && data[:writing])
+    e = array.reduce do |result, hash|
       result.merge(hash){|k,v1,v2|v1.merge(v2)}
     end
     wrap_name(e)
+  end
+
+  def self.wrap(raw_data, key_info)
+    raw_data.reduce({}) { |result, (k, v)| result[k] = { key_info => v }; result }
+  end
+
+  def self.wrap_name(hash)
+    c = hash.map { |k, v| { name: k }.merge v }
   end
 
   def self.third_grade(filename, filetype)

@@ -1,7 +1,7 @@
 require_relative 'district'
 require_relative 'parser'
 require_relative 'enrollment_repository'
-# require_relative 'statewide_test_repository'
+require_relative 'statewide_test_repository'
 require 'pry'
 class DistrictRepository
   attr_reader :districts, :enrollment_repo, :state_repo
@@ -13,14 +13,9 @@ class DistrictRepository
   end
 
   def load_data(data)
-    # data = {
-    #   :enrollment => {
-    #     :kindergarten => "./test/data/kid.csv"
-    #   }
-    # Parser.parse(data[:enrollment][:kindergarten])
-      enrollment_repo.load_data(data)
+      enrollment_repo.load_data(data) if data[:enrollment]
       # binding.pry
-      state_repo.load_data(data)
+      state_repo.load_data(data) if data[:statewide_testing]
 
       create_districts_from_repos!
 

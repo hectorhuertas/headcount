@@ -31,13 +31,13 @@ class StParserTest < Minitest::Test
 
   def race_data
     { 'COLORADO' =>  { 'All Students' => { "2011": { math: 0.557, reading: 0.557, writing: 0.557 },
-                                          "2012": { math: 0.558, reading: 0.558, writing: 0.558 } },
-                       'Asian' =>{ "2011": { math: 0.709, reading: 0.709, writing: 0.709 },
-                                  "2012": { math: 0.719, reading: 0.719, writing: 0.719 } } },
+                                           "2012": { math: 0.558, reading: 0.558, writing: 0.558 } },
+                       'Asian' => { "2011": { math: 0.709, reading: 0.709, writing: 0.709 },
+                                    "2012": { math: 0.719, reading: 0.719, writing: 0.719 } } },
       'ACADEMY 20' =>  { 'All Students' => { "2011": { math: 0.68, reading: 0.68, writing: 0.68 },
-                                                "2012":      { math: 0.689, reading: 0.689, writing: 0.689 } },
+                                             "2012": { math: 0.689, reading: 0.689, writing: 0.689 } },
                          'Asian' => { "2011": { math: 0.817, reading: 0.817, writing: 0.817 },
-                                         "2012":{ math: 0.818, reading: 0.818, writing: 0.818 } } } }
+                                      "2012": { math: 0.818, reading: 0.818, writing: 0.818 } } } }
   end
 
   def test_it_parses_third_and_eighth_grade_data
