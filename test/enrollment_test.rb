@@ -20,7 +20,7 @@ class EnrollmentTest < Minitest::Test
     assert_equal 0.05, enroll.kindergarten_participation_in_year(2010)
   end
 
-  def test_high_school_gration_by_year
+  def test_high_school_graduation_by_year
     enroll = Enrollment.new({name: 'Colorado', high_school_graduation: {2010 => 0.078, 2011 => 0.1} })
     expected = {2010 => 0.078, 2011 => 0.1}
     assert_equal 'COLORADO', enroll.name
