@@ -6,7 +6,6 @@ class EnrollmentRepositoryTest < Minitest::Test
     EnrollmentRepository.new([Enrollment.new({name:"FAKE"})])
   end
 
-
   def test_it_exists
     assert EnrollmentRepository
   end
