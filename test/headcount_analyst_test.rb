@@ -194,7 +194,7 @@ class HeadcountAnalystTest < Minitest::Test
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
     ha = HeadcountAnalyst.new(dr)
-    assert ha.kindergarten_participation_correlates_with_high_school_graduation(against: %w(Dist_1 Dist_2 Dist_3 Dist_4))
+    assert ha.kindergarten_participation_correlates_with_high_school_graduation(across: %w(Dist_1 Dist_2 Dist_3 Dist_4))
   end
 
   def test_it_detects_false_correlation_statewise
@@ -217,7 +217,7 @@ class HeadcountAnalystTest < Minitest::Test
     dr = DistrictRepository.new
     dr.load_repos({enrollment: er})
     ha = HeadcountAnalyst.new(dr)
-    refute ha.kindergarten_participation_correlates_with_high_school_graduation(against: %w(Dist_1 Dist_2 Dist_3 Dist_4))
+    refute ha.kindergarten_participation_correlates_with_high_school_graduation(across: %w(Dist_1 Dist_2 Dist_3 Dist_4))
   end
 
   def test_growth_raises_information_error_if_no_grade
