@@ -5,22 +5,23 @@ class EconomicProfileRepository
   attr_reader :profiles
 
   def initialize(profiles = [])
-    @profiles = profiles
+    @economic_profile = profiles
   end
 
   def load_data(data)
-    profiles_data = EpParser.profiles(data[:economic_profile])
-    create_new_profiles(profiles_data)
+    if data[:economic_profile]
+      profiles_data = EpParser.profiles(data[:economic_profile])
+      create_new_profiles(profiles_data)
+    end
   end
 
   def find_by_name(name)
-    statewide_test.find{|test| test.name == name.upcase}
+    economic_profile.find{|profile| profile.name == name.upcase}
   end
 
-
-  def create_new_STtests(profiles_data)
-    profiles_data.each do |profile|
-      @profile << EconomicProfile.new(profile)
+  def create_new_profiles(profiles_data)
+    profiles_data.each do |profile_data|
+      @economic_profile << EconomicProfile.new(profile_data)
     end
   end
 end
