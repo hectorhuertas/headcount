@@ -18,7 +18,7 @@ class StParserTest < Minitest::Test
        third_grade:        { 2008 => { math: 0.857, reading: 0.864, writing: 0.671 },
                              2009 => { math: 0.824, reading: 0.862, writing: 0.706 } },
        "All Students": { 2011 => { math: 0.68 } },
-       Asian: { 2011 => { math: 0.817 } } },
+       Asian: { 2011 => { math: 0.816 } } },
      { name: 'CHICAGO', eighth_grade: { 2008 => { math: 0.697 } } },
      { name: 'MADRID',
        "Hawaiian/Pacific Islander": { 2014 => { reading: 0.519 } },
@@ -55,15 +55,41 @@ class StParserTest < Minitest::Test
                                   writing: 0.706 } } }
   end
 
+  def third_and_eighth_grade_test_data_weird
+    { 'COLORADO' => { 2008 => { math: 0.697,
+                                reading: 0.703,
+                                writing: 0.501 },
+                      2009 => { math: 0.691,
+                                reading: 0.726,
+                                writing: "N/A" } },
+      'ACADEMY 20' => { 2008 => { math: 0.857,
+                                  reading: 0.864,
+                                  writing: 0.671 },
+                        2009 => { math: 0.824,
+                                  reading: 0.862,
+                                  writing: "N/A" } } }
+  end
+
   def race_data
     { 'COLORADO' => { "All Students":  { 2011 => { math: 0.557, reading: 0.557, writing: 0.557 },
-                                         2012 =>  { math: 0.558, reading: 0.558, writing: 0.558 } },
+                                         2012 =>  { math: 0.55, reading: 0.55, writing: 0.55 } },
                       Asian: { 2011 => { math: 0.709, reading: 0.709, writing: 0.709 },
                                2012 => { math: 0.719, reading: 0.719, writing: 0.719 } } },
       'ACADEMY 20' => { "All Students": { 2011 => { math: 0.68, reading: 0.68, writing: 0.68 },
                                           2012 => { math: 0.689, reading: 0.689, writing: 0.689 } },
-                        Asian: { 2011 => { math: 0.817, reading: 0.817, writing: 0.817 },
+                        Asian: { 2011 => { math: 0.816, reading: 0.816, writing: 0.816 },
                                  2012 => { math: 0.818, reading: 0.818, writing: 0.818 } } } }
+  end
+
+  def race_data_weird
+    { 'COLORADO' => { "All Students":   { 2011 => { math: 0.557, reading: 0.557, writing: 0.557 },
+                                          2012 =>  { math: 0.558, reading: 0.558, writing: 0.558 } },
+                      Asian: { 2011 =>  { math: "N/A", reading: "N/A", writing: "N/A" },
+                               2012 =>  { math: 0.719, reading: 0.719, writing: 0.719 } } },
+      'ACADEMY 20' => { "All Students": { 2011 => { math: 0.68, reading: 0.68, writing: 0.68 },
+                                          2012 => { math: 0.689, reading: 0.689, writing: 0.689 } },
+                        Asian: { 2011 => { math: 0.816, reading: 0.816, writing: 0.816 },
+                                 2012 => { math: "N/A", reading: "N/A", writing: "N/A" } } } }
   end
 
   def test_it_parses_third_and_eighth_grade_data
@@ -83,7 +109,7 @@ class StParserTest < Minitest::Test
 
   def test_not_a_number_for_st_parser
     assert StParser.not_a_number?("L")
-    assert StParser.not_a_number?("D")
+    assert StParser.not_a_number?("#")
     refute StParser.not_a_number?("3.392")
   end
 
@@ -93,12 +119,12 @@ class StParserTest < Minitest::Test
               writing: './test/data/weird_race.csv'
     }
     actual = StParser.avg_proficiency(input)
-    expected = race_data
+    expected = race_data_weird
     assert_equal expected, actual
   end
 
-    def test_it_parses_third_and_eighth_grade_data
-      expected = third_and_eighth_grade_test_data
+    def test_it_parses_third_and_eighth_grade_data_weird
+      expected = third_and_eighth_grade_test_data_weird
       assert_equal expected, StParser.third_and_eighth_grade('./test/data/weird_3g.csv')
     end
 end
