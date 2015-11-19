@@ -223,7 +223,7 @@ class HeadcountAnalystTest < Minitest::Test
   def test_growth_raises_information_error_if_no_grade
     dr = DistrictRepository.new
     ha = HeadcountAnalyst.new(dr)
-    assert_raises "InsufficientInformationError: A grade must be provided to answer this question" do
+    assert_raises InsufficientInformationError do
     ha.top_statewide_test_year_over_year_growth(subject: :math)
     end
   end

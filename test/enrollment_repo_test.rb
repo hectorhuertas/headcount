@@ -73,4 +73,5 @@ class EnrollmentRepositoryTest < Minitest::Test
     er = EnrollmentRepository.new([Enrollment.new(name: 'NOT')])
     assert_equal 'NOT', er.find_by_name('noT').name
   end
+
 end

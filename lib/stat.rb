@@ -1,5 +1,6 @@
 module Stat
   def self.round_decimal(number)
+    # return number if number.is_a?(String)
     (1000 * number.to_f).truncate.to_f / 1000
   end
 

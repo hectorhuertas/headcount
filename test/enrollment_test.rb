@@ -53,4 +53,28 @@ class EnrollmentTest < Minitest::Test
     enroll = Enrollment.new({name: 'Colorado', high_school_graduation: {2010 => 0.3839, 2011 => 0.13273} })
     assert_equal 0.383, enroll.graduation_rate_in_year(2010)
   end
+
+  def test_high_school_odd_characters_dont_return_by_year
+     enroll = Enrollment.new({name: 'Colorado', high_school_graduation: {2010 => 0.393, 2011 => "N/A"}})
+     expected = {2010 => 0.393}
+     assert_equal expected, enroll.graduation_rate_by_year
+  end
+
+  def test_kindergarten_odd_characters_dont_return_by_year
+     enroll = Enrollment.new({name: 'Colorado', kindergarten_participation: {2010 => 0.393, 2011 => "N/A"}})
+     expected = {2010 => 0.393}
+     assert_equal expected, enroll.kindergarten_participation_by_year
+  end
+
+  def test_high_school_odd_characters_dont_return_in_year
+     enroll = Enrollment.new({name: 'Colorado', high_school_graduation: {2010 => 0.393, 2011 => "N/A"}})
+     expected = {2010 => 0.393}
+     assert_equal expected, enroll.graduation_rate_in_year(2011)
+  end
+
+  def test_kindergarten_odd_characters_dont_return_in_year
+     enroll = Enrollment.new({name: 'Colorado', kindergarten_participation: {2010 => 0.393, 2011 => "N/A"}})
+     expected = {2010 => 0.393}
+     assert_equal expected, enroll.kindergarten_participation_in_year(2011)
+  end
 end

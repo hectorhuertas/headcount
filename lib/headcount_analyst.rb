@@ -1,5 +1,5 @@
 require_relative 'stat'
-
+require_relative 'errors'
 class HeadcountAnalyst
   attr_reader :district_repository
 
@@ -15,6 +15,9 @@ class HeadcountAnalyst
     data_1 = dist_1.enrollment.kindergarten_participation_by_year
     data_2 = dist_2.enrollment.kindergarten_participation_by_year
 
+    if data_1.empty? || data_2.empty?
+      return "N/A"
+    end
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
@@ -32,6 +35,9 @@ class HeadcountAnalyst
 
       data_1 = dist_1.enrollment.graduation_rate_by_year
       data_2 = dist_2.enrollment.graduation_rate_by_year
+      if data_1.empty? || data_2.empty?
+        return "N/A"
+      end
 
       avg_1 = Stat.average(data_1)
       avg_2 = Stat.average(data_2)
@@ -83,6 +89,9 @@ class HeadcountAnalyst
       # binding.pry
       kinder_variation = kindergarten_participation_rate_variation(d_name)
       graduation_variation = high_school_graduation_variation(d_name)
+      if kinder_variation.nil? || graduation_variation.nil?
+        return "N/A"
+      end
 
       Stat.round_decimal(kinder_variation / graduation_variation)
       # binding.pry
@@ -94,6 +103,7 @@ class HeadcountAnalyst
         next false if dist.name == 'COLORADO'
         # binding.pry
         varience = kindergarten_participation_against_high_school_graduation(dist.name)
+        # next if variance.nil?
         correlates?(varience)
         # false if dist .name == 'COLORADO'
       end
@@ -104,7 +114,7 @@ class HeadcountAnalyst
       #get districts form names
       correlated = district_names.count do |d_name|
         varience = kindergarten_participation_against_high_school_graduation(d_name)
-        correlates?(varience)
+        correlates?(varience) unless variance.nil?
       end
       (correlated / (district_names.count.to_f)) > 0.7
     elsif options[:for] != nil
@@ -168,10 +178,10 @@ class HeadcountAnalyst
   end
 
   def validate_options(options)
-    information_error = "InsufficientInformationError:
-                    A grade must be provided to answer this question"
+    # binding.pry
+    information_error = "A grade must be provided to answer this question"
     grade_error = "UnknownDataError: #{options[:grade]} is not a known grade"
-    raise information_error unless options[:grade]
-    raise grade_error unless [3,8].include?(options[:grade])
+    raise InsufficientInformationError unless options[:grade]
+    raise UnknownDataError unless [3,8].include?(options[:grade])
   end
 end

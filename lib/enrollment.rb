@@ -10,18 +10,32 @@ class Enrollment
   end
 
   def kindergarten_participation_by_year
-    Stat.truncating(@kindergarten_participation)
+    array = @kindergarten_participation.reject do |key, value|
+      value == 'N/A'
+    end
+    Stat.truncating(array)
   end
 
+  # def kindergarten_participation_in_year(year)
+  #   Stat.round_decimal(@kindergarten_participation[year])
+  # end
+
   def kindergarten_participation_in_year(year)
-    Stat.round_decimal(@kindergarten_participation[year])
+    kindergarten_participation_by_year[year]
   end
 
   def graduation_rate_by_year
-    Stat.truncating(@high_school_graduation)
+    array = @high_school_graduation.reject do |key, value|
+      value == 'N/A'
+    end
+    Stat.truncating(array)
   end
 
   def graduation_rate_in_year(year)
-    Stat.round_decimal(@high_school_graduation[year])
+    graduation_rate_by_year[year]
   end
+
+  # def graduation_rate_in_year(year)
+  #   Stat.round_decimal(@high_school_graduation[year])
+  # end
 end
