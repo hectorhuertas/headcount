@@ -114,6 +114,7 @@ class StParserTest < Minitest::Test
   end
 
   def test_it_parses_with_weird_data
+    skip
     input = { math: './test/data/weird_race.csv',
               reading: './test/data/weird_race.csv',
               writing: './test/data/weird_race.csv'
@@ -124,6 +125,7 @@ class StParserTest < Minitest::Test
   end
 
     def test_it_parses_third_and_eighth_grade_data_weird
+      skip
       expected = third_and_eighth_grade_test_data_weird
       assert_equal expected, StParser.third_and_eighth_grade('./test/data/weird_3g.csv')
     end

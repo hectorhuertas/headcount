@@ -10,10 +10,7 @@ class Enrollment
   end
 
   def kindergarten_participation_by_year
-    array = @kindergarten_participation.reject do |key, value|
-      value == 'N/A'
-    end
-    Stat.truncating(array)
+    Stat.truncating(@kindergarten_participation)
   end
 
   # def kindergarten_participation_in_year(year)
@@ -25,10 +22,7 @@ class Enrollment
   end
 
   def graduation_rate_by_year
-    array = @high_school_graduation.reject do |key, value|
-      value == 'N/A'
-    end
-    Stat.truncating(array)
+    Stat.truncating(@high_school_graduation)
   end
 
   def graduation_rate_in_year(year)

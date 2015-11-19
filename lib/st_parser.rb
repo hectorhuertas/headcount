@@ -42,7 +42,7 @@ module StParser
   def self.third_and_eighth_grade(filename)
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
       if row[:data].nil? || not_a_number?(row[:data])
-        {row[:location].upcase => {row[:timeframe].to_i => {row[:score].downcase.to_sym => "N/A"}}}
+        nil
       else
         {row[:location].upcase => {row[:timeframe].to_i => {row[:score].downcase.to_sym => row[:data].to_f}}}
       end
@@ -53,7 +53,7 @@ module StParser
   def self.race(filename, filetype)
     lines = CSV.open(filename, headers: true, header_converters: :symbol).map do |row|
       if row[:data].nil? || not_a_number?(row[:data])
-        {row[:location].upcase => {row[:race_ethnicity].to_sym => {row[:timeframe].to_i =>{ filetype => "N/A"}}}}
+        nil
       else
         {row[:location].upcase => {row[:race_ethnicity].to_sym => {row[:timeframe].to_i =>{ filetype => row[:data].to_f}}}}
       end

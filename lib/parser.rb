@@ -46,7 +46,7 @@ module Parser
 
   def self.frame_work(row)
     if is_not_a_number?(row[:data])
-      { row[:location].upcase => { row[:timeframe].to_i => "N/A" } }
+      nil
     else
       { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f } }
     end

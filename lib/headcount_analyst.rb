@@ -1,5 +1,7 @@
 require_relative 'stat'
 require_relative 'errors'
+require 'pry'
+require 'pry-rescue'
 class HeadcountAnalyst
   attr_reader :district_repository
 
@@ -15,9 +17,9 @@ class HeadcountAnalyst
     data_1 = dist_1.enrollment.kindergarten_participation_by_year
     data_2 = dist_2.enrollment.kindergarten_participation_by_year
 
-    if data_1.empty? || data_2.empty?
-      return "N/A"
-    end
+    # if data_1.empty? || data_2.empty?
+    #   return "N/A"
+    # end
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
@@ -35,9 +37,9 @@ class HeadcountAnalyst
 
       data_1 = dist_1.enrollment.graduation_rate_by_year
       data_2 = dist_2.enrollment.graduation_rate_by_year
-      if data_1.empty? || data_2.empty?
-        return "N/A"
-      end
+      # if data_1.empty? || data_2.empty?
+      #   return "N/A"
+      # end
 
       avg_1 = Stat.average(data_1)
       avg_2 = Stat.average(data_2)
@@ -89,9 +91,9 @@ class HeadcountAnalyst
       # binding.pry
       kinder_variation = kindergarten_participation_rate_variation(d_name)
       graduation_variation = high_school_graduation_variation(d_name)
-      if kinder_variation.nil? || graduation_variation.nil?
-        return "N/A"
-      end
+      # if kinder_variation.nil? || graduation_variation.nil?
+      #   return "N/A"
+      # end
 
       Stat.round_decimal(kinder_variation / graduation_variation)
       # binding.pry
@@ -114,7 +116,7 @@ class HeadcountAnalyst
       #get districts form names
       correlated = district_names.count do |d_name|
         varience = kindergarten_participation_against_high_school_graduation(d_name)
-        correlates?(varience) unless variance.nil?
+        correlates?(varience)
       end
       (correlated / (district_names.count.to_f)) > 0.7
     elsif options[:for] != nil
@@ -131,12 +133,22 @@ class HeadcountAnalyst
     validate_options(options)
     if options[:top]
       sorted = district_repository.districts.sort_by do |district|
-        statewide_test_year_over_year_growth(district, options)
+        a = statewide_test_year_over_year_growth(district, options)
+        if a.to_f.nan?
+          0
+        else
+          a
+        end
       end
       sorted.reverse.take(options[:top])
     else
     top = district_repository.districts.max_by do |district|
-      statewide_test_year_over_year_growth(district, options)
+      a = statewide_test_year_over_year_growth(district, options)
+      if a.to_f.nan?
+        0
+      else
+        a
+      end
     end
     [top.name, statewide_test_year_over_year_growth(top, options)]
     end
@@ -145,31 +157,48 @@ class HeadcountAnalyst
   def statewide_test_year_over_year_growth(dist, options)
     years = dist.statewide_test.proficient_by_grade(options[:grade]).keys
     return 0 if years.size < 2
+
     if options[:subject]
-      actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[-1])
-      old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], years[0])
+      max = years.max_by do |year|
+        dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 0
+      end
+      min = years.min_by do |year|
+        dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 99
+      end
+      # binding.pry
+      actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], max)
+      old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], min)
     else
-      actual = weighted_average(dist,options, years[-1])
-      old = weighted_average(dist,options, years[0])
+      max = years.max_by do |year|
+        # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 0
+        weighted_average(dist, options, year) || 0
+      end
+      min = years.min_by do |year|
+        # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 99
+        weighted_average(dist, options, year) || 99
+      end
+      actual = weighted_average(dist,options, max)
+      old = weighted_average(dist,options, min)
       # binding.pry
     end
-    period = years[-1] - years[0]
-    (actual - old) / period
+    period = max - min
+    # period = years[-1] - years[0]
+    (actual - old).to_f / period.to_f
   end
 
   def weighted_average(dist,options,year)
     custom_error = "WeightError: Weigths must add to 1"
     raise custom_error if (options[:weighting] && (options[:weighting][:math] + options[:weighting][:reading] + options[:weighting][:writing]) != 1)
 
-      math = dist.statewide_test.proficient_for_subject_by_grade_in_year(:math, options[:grade], year)
-      reading = dist.statewide_test.proficient_for_subject_by_grade_in_year(:reading, options[:grade], year)
-      writing = dist.statewide_test.proficient_for_subject_by_grade_in_year(:writing, options[:grade], year)
+      math = dist.statewide_test.proficient_for_subject_by_grade_in_year(:math, options[:grade], year) || 0
+      reading = dist.statewide_test.proficient_for_subject_by_grade_in_year(:reading, options[:grade], year) || 0
+      writing = dist.statewide_test.proficient_for_subject_by_grade_in_year(:writing, options[:grade], year) || 0
 
     if options[:weighting]
       math_weight = options[:weighting][:math]
       reading_weight = options[:weighting][:reading]
       writing_weight = options[:weighting][:writing]
-      sum = math * math_weight + reading * reading_weight + writing * writing_weight
+      sum = math.to_f * math_weight.to_f + reading.to_f * reading_weight.to_f + writing * writing_weight
       # binding.pry
     else
       (math + reading + writing)/3.0
