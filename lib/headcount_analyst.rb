@@ -99,8 +99,8 @@ class HeadcountAnalyst
       end
       # binding.pry
       (correlated / (district_repository.districts.count.to_f - 1)) > 0.7
-    elsif options[:against] != nil
-      district_names = options[:against]
+    elsif options[:across] != nil
+      district_names = options[:across]
       #get districts form names
       correlated = district_names.count do |d_name|
         varience = kindergarten_participation_against_high_school_graduation(d_name)
