@@ -15,6 +15,17 @@ class ParserTest < Minitest::Test
                                       2006 => 0.5 } } }
   end
 
+  def kindergarten_test_data_with_strange
+    { 'COLORADO' => {
+      kindergarten_participation: { 2007 => 0.394,
+                                    2005 => 0.278,
+                                    2006 => "N/A" } },
+      'AGATE 300' => {
+      kindergarten_participation: { 2007 => 1.0,
+                                    2006 => 0.5,
+                                    2005 => "N/A" } } }
+  end
+
   def high_school_graduation_test_data
     { 'COLORADO' => {
       high_school_graduation: { 2010 => 0.724,
@@ -23,6 +34,18 @@ class ParserTest < Minitest::Test
         high_school_graduation: { 2011 => 0.8,
                                   2012 => 0.6 } } }
   end
+
+  def high_school_graduation_test_data_with_strange_values
+    { 'COLORADO' => {
+      high_school_graduation: { 2010 => 0.724,
+                                2011 => 0.739,
+                                2012 => "N/A"} },
+      'AGATE 300' => {
+        high_school_graduation: { 2011 => 0.8,
+                                  2012 => 0.6,
+                                  2013 => "N/A"} } }
+  end
+
 
   def mixed_enrollment_test_data
     [{ name: 'COLORADO',
@@ -42,8 +65,8 @@ class ParserTest < Minitest::Test
     assert_equal expected, Parser.kindergarten('./test/data/kid.csv')
   end
 
-  def test_it_parses_kindergarten_data_without_strange_values
-    expected = kindergarten_test_data
+  def test_it_parses_kindergarten_data_with_strange_values
+    expected = kindergarten_test_data_with_strange
     assert_equal expected, Parser.kindergarten('./test/data/kid_weird.csv')
   end
 
@@ -52,8 +75,8 @@ class ParserTest < Minitest::Test
     assert_equal expected, Parser.high_school_graduation('./test/data/high_school.csv')
   end
 
-  def test_it_parses_high_school_data_without_strange_values
-    expected = high_school_graduation_test_data
+  def test_it_parses_high_school_data_with_strange_values
+    expected = high_school_graduation_test_data_with_strange_values
     assert_equal expected, Parser.high_school_graduation('./test/data/high_school_weird.csv')
   end
 
@@ -87,7 +110,8 @@ class ParserTest < Minitest::Test
   end
 
   def test_frame_work_returns_nil
-    input = { location: 'Colorado', timeframe: '2010', data: 'N/A' }
-    assert_equal nil, Parser.frame_work(input)
+    input = { location: 'Colorado', timeframe: '2010', data: 'LNE' }
+    result = {"COLORADO"=>{2010=>"N/A"}}
+    assert_equal result, Parser.frame_work(input)
   end
 end

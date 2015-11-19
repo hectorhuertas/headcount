@@ -41,12 +41,12 @@ module Parser
   end
 
   def self.is_not_a_number?(string)
-    string.start_with?("#", "N")
+    string.start_with?("#", "N", "L")
   end
 
   def self.frame_work(row)
     if is_not_a_number?(row[:data])
-      nil
+      { row[:location].upcase => { row[:timeframe].to_i => "N/A" } }
     else
       { row[:location].upcase => { row[:timeframe].to_i => row[:data].to_f } }
     end
