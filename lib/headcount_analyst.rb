@@ -111,12 +111,10 @@ class HeadcountAnalyst
   end
 
   def check_multiple_districts_correlation(district_names)
-    # binding.pry
     correlated = district_names.count do |d_name|
       check_district_correlation(d_name)
     end
     (correlated.to_f / (district_names.count)) > 0.7
-    # binding.pry
   end
 
   def check_district_correlation(d_name)

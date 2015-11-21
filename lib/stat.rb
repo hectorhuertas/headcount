@@ -18,14 +18,29 @@ module Stat
     end.compact.to_h
   end
 
-  def self.nested_truncating(hash)
+  def self.na_truncating(hash)
+    # return "N/A÷" if hash.values.all?{|value| value == 'N/A'}
     hash.map do |key, value|
-      if value.nil?
-        1.0
+      if value == 'N/A'
+        [key, "N/A"]
+      else
+      [key, round_decimal(value)]
       end
-      new_value = truncating(value)
-      [key, new_value]
-    end.to_h
+    end.compact.to_h
+  end
+
+  def self.nested_truncating(hash)
+    return "N/A" if hash.values.all?{|value| value == 'N/A'}
+    hash.map do |key, value|
+      # binding.pry
+      # if value.values == 'N/A'.all?
+      #   [key, "N/A"]
+      # else
+        new_value = na_truncating(value)
+        [key, new_value]
+      # end
+
+    end.compact.to_h
   end
 
   def self.variation(data_1, data_2)
