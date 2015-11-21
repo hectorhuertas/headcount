@@ -26,6 +26,28 @@ class EnrollmentTest < Minitest::Test
     assert_equal 0.05, enroll.kindergarten_participation_in_year(2010)
   end
 
+  def test_kindergarten_participation_by_year_edge_case
+    er = Enrollment.new({name: 'BoB', kindergarten_participation: {2010 => 0.05, 2011 => "N/A"} })
+    result = {2010 => 0.05}
+    assert_equal result, er.kindergarten_participation_by_year
+  end
+
+  def test_kindergarten_participation_by_year_edge_case_all
+    er = Enrollment.new({name: 'BoB', kindergarten_participation: {2010 => "N/A", 2011 => "N/A"} })
+    assert_equal "N/A", er.kindergarten_participation_by_year
+  end
+
+
+  def test_kindergarten_participation_in_year_edge_case_na
+    er = Enrollment.new({name: 'BoB', kindergarten_participation: {2010 => "N/A", 2011 => "N/A"} })
+    assert_equal "N/A", er.kindergarten_participation_in_year(2010)
+  end
+
+  def test_kindergarten_participation_in_year_for_nil_year
+    er = Enrollment.new({name: 'BoB', kindergarten_participation: {2010 => "N/A", 2011 => "N/A"} })
+    assert_equal "N/A", er.kindergarten_participation_in_year(2013)
+  end
+
   def test_kindergarten_participation_in_given_year_truncated
     enroll = Enrollment.new({name: 'Colorado', kindergarten_participation: {2010 => 0.05893, 2011 => 0.13399} })
     assert_equal 0.058, enroll.kindergarten_participation_in_year(2010)
@@ -53,4 +75,5 @@ class EnrollmentTest < Minitest::Test
     enroll = Enrollment.new({name: 'Colorado', high_school_graduation: {2010 => 0.3839, 2011 => 0.13273} })
     assert_equal 0.383, enroll.graduation_rate_in_year(2010)
   end
+
 end
