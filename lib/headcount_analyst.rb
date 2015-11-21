@@ -153,9 +153,9 @@ class HeadcountAnalyst
 
   def statewide_test_year_over_year_growth(dist, options)
     years = dist.statewide_test.proficient_by_grade(options[:grade]).keys
-     return 'N/A' if years.size < 2
-     return 'N/A' if years.all? { |year| dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == 'N/A'}
+    #  return 'N/A' if years.size < 2
      if options[:subject]
+     return 'N/A' if years.all? { |year| dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == 'N/A'}
        max = years.max_by do |year|
          if dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == "N/A"
            0
@@ -179,19 +179,20 @@ class HeadcountAnalyst
      else
        max = years.max_by do |year|
          # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 0
-         weighted_average(dist, options, year) || 0
+         weighted_average(dist, options, year)== ' N/A' ? 0 : year
        end
        min = years.min_by do |year|
          # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 99
-         weighted_average(dist, options, year) || 99
+         weighted_average(dist, options, year) == 'N/A' ? 99 : year
        end
        actual = weighted_average(dist,options, max)
        old = weighted_average(dist,options, min)
      end
-    #  return 'N/A' if [max,min].all?{|value| value == 'N/A'}
+      # binding.pry if dist.name ==  "OURAY R-1"
      period = max - min
+     return 'N/A' if period == 0
      # period = years[-1] - years[0]
-     Stat.round_decimal((actual - old)/ period)
+     Stat.round_decimal((actual - old)/ period.to_f)
   end
 
   def weighted_average(dist,options,year)
@@ -205,13 +206,13 @@ class HeadcountAnalyst
       math = (math == 'N/A' ? 0.0 : math)
       reading = (reading == 'N/A' ? 0.0 : reading)
       writing = (writing == 'N/A' ? 0.0 : writing)
-
+      # binding.pry
     if options[:weighting]
       math_weight = options[:weighting][:math]
       reading_weight = options[:weighting][:reading]
       writing_weight = options[:weighting][:writing]
-      sum = math * math_weight + reading * reading_weight + writing * writing_weight
       # binding.pry
+      sum = (math * math_weight) + (reading * reading_weight) + (writing * writing_weight)
     else
       (math + reading + writing)/3.0
     end
@@ -219,10 +220,12 @@ class HeadcountAnalyst
   end
 
   def validate_options(options)
-    # information_error = "InsufficientInformationError:
-    #                 A grade must be provided to answer this question"
-    # grade_error = "UnknownDataError: #{options[:grade]} is not a known grade"
+    if options[:weighting]
+      # raise InsufficientInformationError unless options[:weighting][:grade]
+      # raise UnknownDataError unless [3,8].include?(options[:weighting][:grade])
+    else
     raise InsufficientInformationError unless options[:grade]
     raise UnknownDataError unless [3,8].include?(options[:grade])
+  end
   end
 end

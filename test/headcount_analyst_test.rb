@@ -3,6 +3,9 @@ require 'minitest/autorun'
 require './lib/headcount_analyst'
 require './lib/enrollment'
 require './lib/statewide_test'
+require './lib/enrollment_repository'
+require './lib/statewide_test_repository'
+require './lib/district'
 require 'pry'
 
 class HeadcountAnalystTest < Minitest::Test
@@ -545,177 +548,207 @@ class HeadcountAnalystTest < Minitest::Test
     assert_equal ["TOP", 2], ha.top_statewide_test_year_over_year_growth(grade: 3, subject: :math)
   end
 
+
+  def test_top_growth_with_different_order
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data2 = {name: "low",
+      third_grade: {
+        2008 => { math: 5, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data3 = {name: "top",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    st2 = StatewideTest.new(data2)
+    st3 = StatewideTest.new(data3)
+    str = StatewideTestRepository.new([st2,st3,st1])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal ["TOP", 2], ha.top_statewide_test_year_over_year_growth(grade: 3, subject: :math)
+  end
+
+  def test_top_3_growth
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data2 = {name: "low",
+      third_grade: {
+        2008 => { math: 5, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data3 = {name: "top",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
+    data4 = {name: "cero",
+      third_grade: {
+        2008 => { math: 6, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    st2 = StatewideTest.new(data2)
+    st3 = StatewideTest.new(data3)
+    st4 = StatewideTest.new(data4)
+    str = StatewideTestRepository.new([st1, st2, st3, st4])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    top_3 = ha.top_statewide_test_year_over_year_growth(grade: 3, top: 3, subject: :math)
+    expected = %w(TOP BOB LOW)
+    assert_equal expected, top_3.map(&:name)
+  end
+
+  def test_another_top_3_growth
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data2 = {name: "low",
+      third_grade: {
+        2008 => { math: 5, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data3 = {name: "top",
+      third_grade: {
+        2008 => { math: 3, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
+    data4 = {name: "cero",
+      third_grade: {
+        2008 => { math: 6, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
+    data5 = {name: "master",
+      third_grade: {
+        2008 => { math: 0, reading: 0.7, writing: 0.8 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 10, reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    st2 = StatewideTest.new(data2)
+    st3 = StatewideTest.new(data3)
+    st4 = StatewideTest.new(data4)
+    st5 = StatewideTest.new(data5)
+    str = StatewideTestRepository.new([st5, st1, st2, st3, st4])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    top_3 = ha.top_statewide_test_year_over_year_growth(grade: 3, top: 3, subject: :math)
+    expected = %w(MASTER TOP BOB)
+    assert_equal expected, top_3.map(&:name)
+  end
+
+  def test_growth_across_all_subjects
+    skip
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 3, reading: 5, writing: 7 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 8, writing: 10 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 1, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
+  end
+
+  # def test_another_growth_across_all_subjects
+  #   # skip
+  #   data = {name: "bob",
+  #     third_grade: {
+  #       2008 => { math: 3, reading: 4, writing: 5 },
+  #       2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+  #       2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+  #       2011 => { math: 11, reading: 10, writing: 9 } }}
+  #   str = StatewideTestRepository.new([StatewideTest.new(data)])
+  #   dr = DistrictRepository.new
+  #   dr.load_repos({statewide_test: str})
+  #   ha = HeadcountAnalyst.new(dr)
+  #   assert_equal 2, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
+  # end
 #
-#   def test_top_growth_with_different_order
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data2 = {name: "low",
-#       third_grade: {
-#         2008 => { math: 5, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data3 = {name: "top",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
-#     st1 = StatewideTest.new(data)
-#     st2 = StatewideTest.new(data2)
-#     st3 = StatewideTest.new(data3)
-#     str = StatewideTestRepository.new([st2,st3,st1])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_equal ["TOP", 2], ha.top_statewide_test_year_over_year_growth(grade: 3, subject: :math)
-#   end
-#
-#   def test_top_3_growth
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data2 = {name: "low",
-#       third_grade: {
-#         2008 => { math: 5, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data3 = {name: "top",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
-#     data4 = {name: "cero",
-#       third_grade: {
-#         2008 => { math: 6, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     st1 = StatewideTest.new(data)
-#     st2 = StatewideTest.new(data2)
-#     st3 = StatewideTest.new(data3)
-#     st4 = StatewideTest.new(data4)
-#     str = StatewideTestRepository.new([st1, st2, st3, st4])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     top_3 = ha.top_statewide_test_year_over_year_growth(grade: 3, top: 3, subject: :math)
-#     expected = %w(TOP BOB LOW)
-#     assert_equal expected, top_3.map(&:name)
-#   end
-#
-#   def test_another_top_3_growth
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data2 = {name: "low",
-#       third_grade: {
-#         2008 => { math: 5, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data3 = {name: "top",
-#       third_grade: {
-#         2008 => { math: 3, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 9, reading: 0.5, writing: 0.7 } }}
-#     data4 = {name: "cero",
-#       third_grade: {
-#         2008 => { math: 6, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 0.5, writing: 0.7 } }}
-#     data5 = {name: "master",
-#       third_grade: {
-#         2008 => { math: 0, reading: 0.7, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 10, reading: 0.5, writing: 0.7 } }}
-#     st1 = StatewideTest.new(data)
-#     st2 = StatewideTest.new(data2)
-#     st3 = StatewideTest.new(data3)
-#     st4 = StatewideTest.new(data4)
-#     st5 = StatewideTest.new(data5)
-#     str = StatewideTestRepository.new([st5, st1, st2, st3, st4])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     top_3 = ha.top_statewide_test_year_over_year_growth(grade: 3, top: 3, subject: :math)
-#     expected = %w(MASTER TOP BOB)
-#     assert_equal expected, top_3.map(&:name)
-#   end
-#
-#   def test_growth_across_all_subjects
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 5, writing: 7 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 8, writing: 10 } }}
-#     str = StatewideTestRepository.new([StatewideTest.new(data)])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_equal 1, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
-#   end
-#
-#   def test_another_growth_across_all_subjects
-#     # skip
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 4, writing: 5 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 11, reading: 10, writing: 9 } }}
-#     str = StatewideTestRepository.new([StatewideTest.new(data)])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_equal 2, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
-#   end
-#
-#   def test_weight_adds_to_one
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 3, reading: 4, writing: 5 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 11, reading: 10, writing: 9 } }}
-#     str = StatewideTestRepository.new([StatewideTest.new(data)])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_raises "WeightError: Weigths must add to 1" do
-#       ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3,:weighting => {:math => 0.5, :reading => 0.5, :writing => 0.2})
-#     end
-#   end
-#
-#   def test_weigthed_growth
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 4, reading: 6, writing: 10 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 6, reading: 10, writing: 100 } }}
-#     str = StatewideTestRepository.new([StatewideTest.new(data)])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_equal 1, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0})
-#   end
+  def test_weight_adds_to_one
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 3, reading: 4, writing: 5 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 11, reading: 10, writing: 9 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_raises "WeightError: Weigths must add to 1" do
+      ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3,:weighting => {:math => 0.5, :reading => 0.5, :writing => 0.2})
+    end
+  end
+
+  def test_weigthed_growth
+    skip
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 4, reading: 6, writing: 10 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 10, writing: 100 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 1, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0})
+  end
+
+  def test_weighted_average
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 2, reading: 6, writing: 10 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 10, writing: 100 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 4, ha.weighted_average(dr.find_by_name("bob"),{grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0}}, 2008)
+  end
+
+  def test_weighted_average_na
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: 'N/A', reading: 6, writing: 10 },
+        2009 => { math: 2, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 10, writing: 100 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 2, ha.weighted_average(dr.find_by_name("bob"),{grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0}}, 2008)
+  end
 #
 #   def test_top_weigthed_growth
 #     data = {name: "bob",
