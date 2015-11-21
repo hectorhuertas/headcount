@@ -1,25 +1,27 @@
 module Stat
   def self.round_decimal(number)
-    if number == "N/A"
-      1.0
+    if number == "N/A" || number == nil
+      "N/A"
     else
-    (1000.0 * number.to_f).truncate.to_f / 1000.0
+    (1000.0 * number.to_f).truncate / 1000.0
     end
   end
 
   def self.truncating(hash)
+    return "N/A" if hash.values.all?{|value| value == 'N/A'}
     hash.map do |key, value|
-      if value.nil?
-        0.0
-      end
+      if value == 'N/A'
+        nil
+      else
       [key, round_decimal(value)]
-    end.to_h
+      end
+    end.compact.to_h
   end
 
   def self.nested_truncating(hash)
     hash.map do |key, value|
       if value.nil?
-        0.0
+        1.0
       end
       new_value = truncating(value)
       [key, new_value]
@@ -27,13 +29,13 @@ module Stat
   end
 
   def self.variation(data_1, data_2)
-    average(data_1).to_f / average(data_2).to_f
+    average(data_1) / average(data_2)
   end
 
   def self.average(hash)
     sum = hash.values.reduce(:+)
     count = hash.size
-    sum.to_f / count.to_f
+    sum / count
   end
 
   def self.compare_trends(trend_1,trend_2)
@@ -45,7 +47,7 @@ module Stat
     common.each {|year| common_trend_2[year]=trend_2[year]}
 
     common_trend_1.merge(common_trend_2) do |year, av1, av2|
-      round_decimal(av1.to_f/av2.to_f)
+      round_decimal(av1/av2)
     end.sort.to_h
   end
 end

@@ -14,15 +14,16 @@ class HeadcountAnalyst
 
     data_1 = dist_1.enrollment.kindergarten_participation_by_year
     data_2 = dist_2.enrollment.kindergarten_participation_by_year
+    return "N/A" if na_check(data_1, data_2)
 
     avg_1 = Stat.average(data_1)
     avg_2 = Stat.average(data_2)
 
     Stat.round_decimal(avg_1 / avg_2)
-    # general_variation(d1_name,
-    #                   options[:against],
-    #                   :enrollment,
-    #                   :kindergarten_participation_by_year)
+  end
+
+  def na_check(data_1, data_2)
+    data_1 == "N/A"|| data_2 == "N/A"
   end
 
   def high_school_graduation_variation(d1_name, options = {against: 'colorado'})
@@ -32,6 +33,8 @@ class HeadcountAnalyst
 
       data_1 = dist_1.enrollment.graduation_rate_by_year
       data_2 = dist_2.enrollment.graduation_rate_by_year
+      # return "N/A" if data_1 == "N/A"|| data_2 == "N/A"
+      return "N/A" if na_check(data_1, data_2)
 
       avg_1 = Stat.average(data_1)
       avg_2 = Stat.average(data_2)
@@ -39,15 +42,15 @@ class HeadcountAnalyst
       Stat.round_decimal(avg_1 / avg_2)
   end
 
-  def general_variation(d1_name, d2_name, area, type)
-    dist_1 = district_repository.find_by_name(d1_name)
-    dist_2 = district_repository.find_by_name(d2_name)
-
-    data_1 = load_district_data(dist_1, area, type)
-    data_2 = load_district_data(dist_2, area, type)
-
-    Stat.round_decimal(Stat.variation(data_1, data_2))
-  end
+  # def general_variation(d1_name, d2_name, area, type)
+  #   dist_1 = district_repository.find_by_name(d1_name)
+  #   dist_2 = district_repository.find_by_name(d2_name)
+  #
+  #   data_1 = load_district_data(dist_1, area, type)
+  #   data_2 = load_district_data(dist_2, area, type)
+  #
+  #   Stat.round_decimal(Stat.variation(data_1, data_2))
+  # end
 
   # def general_variance(d_name, area1, type1, area2, type2)
   #   dist = district_repository.find_by_name(d_name)
@@ -62,6 +65,9 @@ class HeadcountAnalyst
 
     data_1 = dist_1.enrollment.kindergarten_participation_by_year
     data_2 = dist_2.enrollment.kindergarten_participation_by_year
+    return "N/A" if na_check(data_1, data_2)
+
+    # return "N/A" if data_1 == "N/A"|| data_2.values == "N/A"
     Stat.compare_trends(data_1, data_2)
   end
 
@@ -71,22 +77,22 @@ class HeadcountAnalyst
     district.send(area).send(type)
   end
 
-  info = {area: :enrollment, type: :kindergarten }
-  def average(district, area, type)
-    data = load_district_data(district, area, type)
-    sum = data.values.reduce(:+)
-    count = data.size
-    Stat.round_decimal(sum / count)
-  end
+  # info = {area: :enrollment, type: :kindergarten }
+  # def average(district, area, type)
+  #   data = load_district_data(district, area, type)
+  #   sum = data.values.reduce(:+)
+  #   count = data.size
+  #   Stat.round_decimal(sum / count)
+  # end
 
   def kindergarten_participation_against_high_school_graduation(d_name)
-      # binding.pry
       kinder_variation = kindergarten_participation_rate_variation(d_name)
       graduation_variation = high_school_graduation_variation(d_name)
-      if kinder_variation.nan? || graduation_variation.nan?
-        binding.pry
-      end
-      Stat.round_decimal(kinder_variation.to_f / graduation_variation.to_f)
+      # binding.pry
+      # return "N/A" if data_1 == "N/A"|| data_2.values == "N/A"
+      return "N/A" if na_check(kinder_variation, graduation_variation)
+
+      Stat.round_decimal(kinder_variation / graduation_variation)
       # binding.pry
   end
 
@@ -94,31 +100,32 @@ class HeadcountAnalyst
     if options[:for] == 'STATEWIDE'
       correlated = district_repository.districts.count do |dist|
         next false if dist.name == 'COLORADO'
-        varience = kindergarten_participation_against_high_school_graduation(dist.name)
-        correlates?(varience.to_f)
-        # false if dist .name == 'COLORADO'
+        check_district_correlation(dist.name)
       end
-      # binding.pry
       (correlated / (district_repository.districts.count.to_f - 1)) > 0.7
     elsif options[:across] != nil
-      district_names = options[:across]
-      #get districts form names
-      correlated = district_names.count do |d_name|
-        varience = kindergarten_participation_against_high_school_graduation(d_name)
-        if varience.nan?
-          binding.pry
-        end
-        correlates?(varience.to_f)
-        # binding.pry
-      end
-      (correlated / (district_names.count.to_f)) > 0.7
+      check_multiple_districts_correlation(options[:across])
     elsif options[:for] != nil
-      variance = kindergarten_participation_against_high_school_graduation(options[:for])
-      correlates?(variance)
+      check_district_correlation(options[:for])
     end
   end
 
+  def check_multiple_districts_correlation(district_names)
+    # binding.pry
+    correlated = district_names.count do |d_name|
+      check_district_correlation(d_name)
+    end
+    (correlated.to_f / (district_names.count)) > 0.7
+    # binding.pry
+  end
+
+  def check_district_correlation(d_name)
+    variance = kindergarten_participation_against_high_school_graduation(d_name)
+    correlates?(variance)
+  end
+
   def correlates?(variance)
+    return false if variance == 'N/A'
     0.6 < variance && variance < 1.5
   end
 
@@ -166,7 +173,7 @@ class HeadcountAnalyst
      end
      period = max - min
      # period = years[-1] - years[0]
-     (actual - old).to_f / period.to_f
+     (actual - old)/ period
   end
 
   def weighted_average(dist,options,year)
