@@ -131,12 +131,21 @@ class HeadcountAnalyst
     validate_options(options)
     if options[:top]
       sorted = district_repository.districts.sort_by do |district|
-        statewide_test_year_over_year_growth(district, options)
+        # statewide_test_year_over_year_growth(district, options)
+        if statewide_test_year_over_year_growth(district, options) == 'N/A'
+          0
+        else
+          statewide_test_year_over_year_growth(district, options)
+        end
       end
       sorted.reverse.take(options[:top])
     else
     top = district_repository.districts.max_by do |district|
-      statewide_test_year_over_year_growth(district, options)
+      if statewide_test_year_over_year_growth(district, options) == 'N/A'
+        0
+      else
+        statewide_test_year_over_year_growth(district, options)
+      end
     end
     [top.name, statewide_test_year_over_year_growth(top, options)]
     end
@@ -144,16 +153,26 @@ class HeadcountAnalyst
 
   def statewide_test_year_over_year_growth(dist, options)
     years = dist.statewide_test.proficient_by_grade(options[:grade]).keys
-     return 0 if years.size < 2
-
+     return 'N/A' if years.size < 2
+     return 'N/A' if years.all? { |year| dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == 'N/A'}
      if options[:subject]
        max = years.max_by do |year|
-         dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year)
+         if dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == "N/A"
+           0
+         else
+           year
+         end
        end
        min = years.min_by do |year|
-        dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year).nil?
+        # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year)
        # binding.pry
+       if dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == "N/A"
+         99999
+       else
+         year
+       end
       end
+      #  binding.pry
        actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], max)
        old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], min)
        # binding.pry
@@ -169,9 +188,10 @@ class HeadcountAnalyst
        actual = weighted_average(dist,options, max)
        old = weighted_average(dist,options, min)
      end
+    #  return 'N/A' if [max,min].all?{|value| value == 'N/A'}
      period = max - min
      # period = years[-1] - years[0]
-     (actual - old)/ period
+     Stat.round_decimal((actual - old)/ period)
   end
 
   def weighted_average(dist,options,year)
@@ -181,6 +201,10 @@ class HeadcountAnalyst
       math = dist.statewide_test.proficient_for_subject_by_grade_in_year(:math, options[:grade], year)
       reading = dist.statewide_test.proficient_for_subject_by_grade_in_year(:reading, options[:grade], year)
       writing = dist.statewide_test.proficient_for_subject_by_grade_in_year(:writing, options[:grade], year)
+
+      math = (math == 'N/A' ? 0.0 : math)
+      reading = (reading == 'N/A' ? 0.0 : reading)
+      writing = (writing == 'N/A' ? 0.0 : writing)
 
     if options[:weighting]
       math_weight = options[:weighting][:math]
@@ -195,10 +219,10 @@ class HeadcountAnalyst
   end
 
   def validate_options(options)
-    information_error = "InsufficientInformationError:
-                    A grade must be provided to answer this question"
-    grade_error = "UnknownDataError: #{options[:grade]} is not a known grade"
-    raise information_error unless options[:grade]
-    raise grade_error unless [3,8].include?(options[:grade])
+    # information_error = "InsufficientInformationError:
+    #                 A grade must be provided to answer this question"
+    # grade_error = "UnknownDataError: #{options[:grade]} is not a known grade"
+    raise InsufficientInformationError unless options[:grade]
+    raise UnknownDataError unless [3,8].include?(options[:grade])
   end
 end

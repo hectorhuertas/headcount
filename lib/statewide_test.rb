@@ -42,6 +42,7 @@ class StatewideTest
   end
 
   def proficient_for_subject_by_grade_in_year(subject, grade, year)
+    # binding.pry unless valid_subjects.include?(subject)
     fail UnknownDataError unless valid_subjects.include?(subject)
     # return 'N/A' if proficient_by_grade(grade) == 'N/A'
     proficient_by_grade(grade)[year][subject]
