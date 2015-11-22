@@ -242,8 +242,20 @@ class HeadcountAnalyst
     end
   end
 
+  def weighted_na_problem(math, reading, writing)
+    stuff = [math, reading, writing].select {|value| value != "N/A" }
+    amount = stuff.count
+    # binding.pry
+    return "N/A" if stuff.empty?
+    # binding.pry
+    stuff.reduce(:+) / amount
+  end
+
   def subject_growth(dist, grade, subject)
     years = dist.statewide_test.proficient_by_grade(grade).keys
+    # binding.pry
+    return 'N/A' if years.all? { |year| dist.statewide_test.proficient_for_subject_by_grade_in_year(subject,grade, year) == "N/A"}
+    # return 'N/A' if years.all? { |year| dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == 'N/A'}
 
     most_recent_year =  most_recent_year(dist,grade,subject, years)
     oldest_year = oldest_year(dist,grade,subject, years)
@@ -271,13 +283,13 @@ class HeadcountAnalyst
     end
   end
 
-  def weighted_na_problem(math, reading, writing)
-    stuff = [math, reading, writing].select {|value| value != "N/A" }
-    amount = stuff.count
+  def district_growth(dist, options)
     # binding.pry
-    return "N/A" if stuff.empty?
-    # binding.pry
-    stuff.reduce(:+) / amount
+    math = subject_growth(dist,options[:grade], :math)
+    reading = subject_growth(dist,options[:grade], :reading)
+    writing = subject_growth(dist,options[:grade], :writing)
+    return 'N/A' if [math,reading,writing].any?{|subject| subject == 'N/A'}
+    (math + reading + writing) / 3
   end
 
 end
