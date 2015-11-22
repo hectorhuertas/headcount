@@ -773,23 +773,78 @@ class HeadcountAnalystTest < Minitest::Test
 #   end
 #
 #   def test_growth_in_one_year
-#     data = {name: "bob",
-#       third_grade: {
-#         2008 => { math: 4, reading: 6, writing: 10 }}}
-#     data2 = {name: "top",
-#       third_grade: {
-#         2008 => { math: 5, reading: 15, writing: 0.8 },
-#         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-#         2011 => { math: 50, reading: 30, writing: 0.7 } }}
-#     st1 = StatewideTest.new(data)
-#     st2 = StatewideTest.new(data2)
-#     str = StatewideTestRepository.new([st1,st2])
-#     dr = DistrictRepository.new
-#     dr.load_repos({statewide_test: str})
-#     ha = HeadcountAnalyst.new(dr)
-#     assert_equal ["TOP", 10], ha.top_statewide_test_year_over_year_growth(grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0})
+    # data = {name: "bob",
+    #   third_grade: {
+    #     2008 => { math: 4, reading: 6, writing: 10 }}}
+    # data2 = {name: "top",
+    #   third_grade: {
+    #     2008 => { math: 5, reading: 15, writing: 0.8 },
+    #     2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+    #     2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+    #     2011 => { math: 50, reading: 30, writing: 0.7 } }}
+    # st1 = StatewideTest.new(data)
+    # st2 = StatewideTest.new(data2)
+    # str = StatewideTestRepository.new([st1,st2])
+    # dr = DistrictRepository.new
+    # dr.load_repos({statewide_test: str})
+    # ha = HeadcountAnalyst.new(dr)
+    # assert_equal ["TOP", 10], ha.top_statewide_test_year_over_year_growth(grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0})
 #
 #   end
-#
+
+
+  def test_subject_growth
+    data = {name: "bob",
+      third_grade: {
+        2007 => { math: 'N/A', reading: 0.7, writing: 0.8 },
+        2008 => { math: 0.2, reading: 0.7, writing: 0.8 },
+        2009 => { math: 'N/A', reading: 0.703, writing: 0.501 },
+        2010 => { math: 4, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.703, writing: 0.501 },
+        2012 => { math: 0.6, reading: 0.703, writing: 0.501 },
+        2013 => { math: 'N/A', reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    str = StatewideTestRepository.new([st1])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    actual = ha.subject_growth(dr.find_by_name('bob'), 3, :math)
+    assert_in_delta 0.1, actual, 0.005 
+  end
+
+  def test_most_recent_year
+    data = {name: "bob",
+      third_grade: {
+        2007 => { math: 'N/A', reading: 0.7, writing: 0.8 },
+        2008 => { math: 0.2, reading: 0.7, writing: 0.8 },
+        2009 => { math: 'N/A', reading: 0.703, writing: 0.501 },
+        2010 => { math: 4, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.703, writing: 0.501 },
+        2012 => { math: 0.6, reading: 0.703, writing: 0.501 },
+        2013 => { math: 'N/A', reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    str = StatewideTestRepository.new([st1])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 2012, ha.most_recent_year(dr.find_by_name('bob'), 3, :math,(2007..2013))
+  end
+
+  def test_oldest_year
+    data = {name: "bob",
+      third_grade: {
+        2007 => { math: 'N/A', reading: 0.7, writing: 0.8 },
+        2008 => { math: 0.2, reading: 0.7, writing: 0.8 },
+        2009 => { math: 'N/A', reading: 0.703, writing: 0.501 },
+        2010 => { math: 4, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 0.703, writing: 0.501 },
+        2012 => { math: 0.6, reading: 0.703, writing: 0.501 },
+        2013 => { math: 'N/A', reading: 0.5, writing: 0.7 } }}
+    st1 = StatewideTest.new(data)
+    str = StatewideTestRepository.new([st1])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 2008, ha.oldest_year(dr.find_by_name('bob'), 3, :math,(2007..2013))
+  end
 end

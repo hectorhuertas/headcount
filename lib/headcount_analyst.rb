@@ -226,6 +226,35 @@ class HeadcountAnalyst
     else
     raise InsufficientInformationError unless options[:grade]
     raise UnknownDataError unless [3,8].include?(options[:grade])
+    end
   end
+
+  def subject_growth(dist, grade, subject)
+    years = dist.statewide_test.proficient_by_grade(grade).keys
+
+    most_recent_year =  most_recent_year(dist,grade,subject, years)
+    oldest_year = oldest_year(dist,grade,subject, years)
+
+    max = dist.statewide_test.proficient_for_subject_by_grade_in_year(subject,grade, most_recent_year)
+    min = dist.statewide_test.proficient_for_subject_by_grade_in_year(subject,grade, oldest_year)
+
+    (max - min) / (most_recent_year - oldest_year)
+
+  end
+
+  def most_recent_year(dist,grade, subject, years)
+    years.max_by do |year|
+      # binding.pry
+      value = dist.statewide_test.proficient_for_subject_by_grade_in_year(subject,grade, year)
+      value == 'N/A' ? 0 : year
+    end
+  end
+
+  def oldest_year(dist,grade, subject, years)
+    years.min_by do |year|
+      # binding.pry
+      value = dist.statewide_test.proficient_for_subject_by_grade_in_year(subject,grade, year)
+      value == 'N/A' ? 99999 : year
+    end
   end
 end
