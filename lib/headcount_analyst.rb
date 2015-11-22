@@ -140,11 +140,13 @@ class HeadcountAnalyst
       end
       sorted.reverse.take(options[:top])
     else
+      # binding.pry if district.name ==  "OURAY R-1"
     top = district_repository.districts.max_by do |district|
       if statewide_test_year_over_year_growth(district, options) == 'N/A'
         0
       else
         statewide_test_year_over_year_growth(district, options)
+        # binding.pry
       end
     end
     [top.name, statewide_test_year_over_year_growth(top, options)]
@@ -167,31 +169,31 @@ class HeadcountAnalyst
         # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year)
        # binding.pry
        if dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) == "N/A"
-         99999
+         999999
        else
          year
        end
-      end
-      #  binding.pry
+     end
+
        actual = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], max)
        old = dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject], options[:grade], min)
-       # binding.pry
+      #  binding.pry
      else
        max = years.max_by do |year|
-         # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 0
-         weighted_average(dist, options, year)== ' N/A' ? 0 : year
-       end
+      weighted_average(dist, options, year) == 'N/A' ? 0 : year
+      end
        min = years.min_by do |year|
-         # dist.statewide_test.proficient_for_subject_by_grade_in_year(options[:subject],options[:grade],year) || 99
-         weighted_average(dist, options, year) == 'N/A' ? 99 : year
+         weighted_average(dist, options, year) == 'N/A' ? 99999 : year
        end
        actual = weighted_average(dist,options, max)
        old = weighted_average(dist,options, min)
+        #  binding.pry
      end
-      # binding.pry if dist.name ==  "OURAY R-1"
+     if old == "N/A" || actual == "N/A"
+       return "N/A"
+     end
      period = max - min
      return 'N/A' if period == 0
-     # period = years[-1] - years[0]
      Stat.round_decimal((actual - old)/ period.to_f)
   end
 
@@ -203,20 +205,31 @@ class HeadcountAnalyst
       reading = dist.statewide_test.proficient_for_subject_by_grade_in_year(:reading, options[:grade], year)
       writing = dist.statewide_test.proficient_for_subject_by_grade_in_year(:writing, options[:grade], year)
 
-      math = (math == 'N/A' ? 0.0 : math)
-      reading = (reading == 'N/A' ? 0.0 : reading)
-      writing = (writing == 'N/A' ? 0.0 : writing)
+      # math = (math == 'N/A' ? 0.0 : math)
+      # reading = (reading == 'N/A' ? 0.0 : reading)
+      # writing = (writing == 'N/A' ? 0.0 : writing)
       # binding.pry
     if options[:weighting]
       math_weight = options[:weighting][:math]
       reading_weight = options[:weighting][:reading]
       writing_weight = options[:weighting][:writing]
-      # binding.pry
-      sum = (math * math_weight) + (reading * reading_weight) + (writing * writing_weight)
-    else
-      (math + reading + writing)/3.0
-    end
+      new_array = []
+      new_array << math * math_weight unless math == "N/A"
+      new_array << reading * reading_weight unless reading == "N/A"
+      new_array << writing * writing_weight unless writing == "N/A"
+      return "N/A" if new_array.empty?
 
+      answer = new_array.reduce(:+) / new_array.count
+
+      # return "N/A" if answer == "N/A"
+    else
+      answer = weighted_na_problem(math, reading, writing)
+    # return "N/A" if answer == "N/A"
+
+    end
+    return "N/A" if answer == "N/A"
+
+    Stat.round_decimal(answer)
   end
 
   def validate_options(options)
@@ -228,4 +241,14 @@ class HeadcountAnalyst
     raise UnknownDataError unless [3,8].include?(options[:grade])
   end
   end
+
+  def weighted_na_problem(math, reading, writing)
+    stuff = [math, reading, writing].select {|value| value != "N/A" }
+    amount = stuff.count
+    # binding.pry
+    return "N/A" if stuff.empty?
+    # binding.pry
+    stuff.reduce(:+) / amount
+  end
+
 end
