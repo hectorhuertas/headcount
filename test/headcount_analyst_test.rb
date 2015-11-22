@@ -662,7 +662,6 @@ class HeadcountAnalystTest < Minitest::Test
   end
 
   def test_growth_across_all_subjects
-    skip
     data = {name: "bob",
       third_grade: {
         2008 => { math: 3, reading: 5, writing: 7 },
@@ -676,20 +675,19 @@ class HeadcountAnalystTest < Minitest::Test
     assert_equal 1, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
   end
 
-  # def test_another_growth_across_all_subjects
-  #   # skip
-  #   data = {name: "bob",
-  #     third_grade: {
-  #       2008 => { math: 3, reading: 4, writing: 5 },
-  #       2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
-  #       2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
-  #       2011 => { math: 11, reading: 10, writing: 9 } }}
-  #   str = StatewideTestRepository.new([StatewideTest.new(data)])
-  #   dr = DistrictRepository.new
-  #   dr.load_repos({statewide_test: str})
-  #   ha = HeadcountAnalyst.new(dr)
-  #   assert_equal 2, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
-  # end
+  def test_another_growth_across_all_subjects
+    data = {name: "bob",
+      third_grade: {
+        2008 => { math: "N/A", reading: 4, writing: 5 },
+        2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 11, reading: 10, writing: 9 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 2, ha.statewide_test_year_over_year_growth(dr.find_by_name("bob"),grade: 3)
+  end
 #
   def test_weight_adds_to_one
     data = {name: "bob",
@@ -708,10 +706,9 @@ class HeadcountAnalystTest < Minitest::Test
   end
 
   def test_weigthed_growth
-    skip
     data = {name: "bob",
       third_grade: {
-        2008 => { math: 4, reading: 6, writing: 10 },
+        2008 => { math: "N/A", reading: "N/A", writing: "N/A" },
         2009 => { math: 0.697, reading: 0.703, writing: 0.501 },
         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
         2011 => { math: 6, reading: 10, writing: 100 } }}
@@ -738,7 +735,7 @@ class HeadcountAnalystTest < Minitest::Test
 
   def test_weighted_average_na
     data = {name: "bob",
-      third_grade: {
+      eighth_grade: {
         2008 => { math: 'N/A', reading: 6, writing: 10 },
         2009 => { math: 2, reading: 0.703, writing: 0.501 },
         2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
@@ -747,7 +744,21 @@ class HeadcountAnalystTest < Minitest::Test
     dr = DistrictRepository.new
     dr.load_repos({statewide_test: str})
     ha = HeadcountAnalyst.new(dr)
-    assert_equal 2, ha.weighted_average(dr.find_by_name("bob"),{grade: 3, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0}}, 2008)
+    assert_equal 2, ha.weighted_average(dr.find_by_name("bob"),{grade: 8, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0}}, 2008)
+  end
+
+  def test_weighted_average_full_na
+    data = {name: "bob",
+      eighth_grade: {
+        2008 => { math: 'N/A', reading: 'N/A', writing: 'N/A' },
+        2009 => { math: 2, reading: 0.703, writing: 0.501 },
+        2010 => { math: 0.697, reading: 0.703, writing: 0.501 },
+        2011 => { math: 6, reading: 10, writing: 100 } }}
+    str = StatewideTestRepository.new([StatewideTest.new(data)])
+    dr = DistrictRepository.new
+    dr.load_repos({statewide_test: str})
+    ha = HeadcountAnalyst.new(dr)
+    assert_equal 2, ha.weighted_average(dr.find_by_name("bob"),{grade: 8, :weighting => {:math => 0.5, :reading => 0.5, :writing => 0.0}}, 2008)
   end
 #
 #   def test_top_weigthed_growth
