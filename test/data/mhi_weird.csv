@@ -1,5 +1,5 @@
 Location,TimeFrame,DataFormat,Data
 Colorado,2005-2009,Currency,50000
 Colorado,2008-2012,Currency,70000
-ACADEMY 20,2006-2010,Currency,80000
-ACADEMY 20,2008-2012,Currency,90000
+ACADEMY,2006-2010,Currency,NA
+ACADEMY,2008-2012,Currency,90000

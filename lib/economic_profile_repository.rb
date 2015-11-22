@@ -2,7 +2,7 @@ require_relative 'ep_parser'
 require_relative 'economic_profile'
 
 class EconomicProfileRepository
-  attr_reader :profiles
+  attr_reader :economic_profile
 
   def initialize(profiles = [])
     @economic_profile = profiles
