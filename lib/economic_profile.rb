@@ -45,7 +45,6 @@ class EconomicProfile
   def free_or_reduced_price_lunch_number_in_year(year)
     fail UnknownDataError unless @data[:free_or_reduced_price_lunch][year][:total]
     Stat.round_decimal(@data[:free_or_reduced_price_lunch][year][:total])
-
   end
 
   def title_i_in_year(year)
