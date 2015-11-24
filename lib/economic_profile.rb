@@ -51,6 +51,5 @@ class EconomicProfile
   def title_i_in_year(year)
     fail UnknownDataError unless @data[:title_i][year]
     Stat.round_decimal(@data[:title_i][year])
-
   end
 end
